@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
@@ -15,9 +16,26 @@ const answerQueueRoutes = require('./routes/answerQueue');
 
 const app = express();
 
+// Logging Middleware
+app.use(morgan(':method :url :status :response-time ms - :res[content-length] bytes'));
+
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      process.env.FRONTEND_URL,
+      'https://web.vxrachit.dpdns.org',
+      'https://web.vxrachit.is-a.dev'
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
