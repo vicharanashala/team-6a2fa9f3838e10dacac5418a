@@ -60,23 +60,23 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-12">
+    <div className="min-h-screen p-6 md:p-12">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">My Profile</h1>
+          <h1 className="text-4xl font-bold text-slate-100 mb-2">My Profile</h1>
           <p className="text-slate-400">Manage your account information</p>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 mb-8 backdrop-blur">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-8 border-b border-slate-700">
+        <div className="card-dark p-8 mb-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-8 border-b border-dark-500/50">
             <div className="flex items-center gap-6 mb-6 md:mb-0">
               <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">{user.name}</h2>
+                <h2 className="text-2xl font-bold text-slate-100">{user.name}</h2>
                 <p className="text-slate-400">{user.role}</p>
                 <p className="text-purple-400 text-sm mt-1">Phase: <span className="font-semibold capitalize">{user.phase}</span></p>
               </div>
@@ -91,19 +91,19 @@ export default function Profile() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-dark-600/50 rounded-lg p-4">
               <p className="text-slate-400 text-sm">Queries Raised</p>
-              <p className="text-2xl font-bold text-white mt-2">{stats.queriesRaised}</p>
+              <p className="text-2xl font-bold text-slate-100 mt-2">{stats.queriesRaised}</p>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-dark-600/50 rounded-lg p-4">
               <p className="text-slate-400 text-sm">Answers Given</p>
-              <p className="text-2xl font-bold text-white mt-2">{stats.answersGiven}</p>
+              <p className="text-2xl font-bold text-slate-100 mt-2">{stats.answersGiven}</p>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-dark-600/50 rounded-lg p-4">
               <p className="text-slate-400 text-sm">Bookmarks</p>
-              <p className="text-2xl font-bold text-white mt-2">{stats.bookmarks}</p>
+              <p className="text-2xl font-bold text-slate-100 mt-2">{stats.bookmarks}</p>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-dark-600/50 rounded-lg p-4">
               <p className="text-slate-400 text-sm">Reputation</p>
               <p className="text-2xl font-bold text-purple-400 mt-2">{stats.reputation}</p>
             </div>
@@ -112,8 +112,8 @@ export default function Profile() {
 
         {/* Edit Form */}
         {isEditing && (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 backdrop-blur">
-            <h3 className="text-xl font-bold text-white mb-6">Edit Profile Information</h3>
+          <div className="card-dark p-8">
+            <h3 className="text-xl font-bold text-slate-100 mb-6">Edit Profile Information</h3>
             
             <div className="space-y-6">
               <div>
@@ -123,7 +123,7 @@ export default function Profile() {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition-colors"
+                  className="input-dark"
                   placeholder="Your full name"
                 />
               </div>
@@ -135,7 +135,7 @@ export default function Profile() {
                   name="college"
                   value={formData.college}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition-colors"
+                  className="input-dark"
                   placeholder="Your college"
                 />
               </div>
@@ -147,7 +147,7 @@ export default function Profile() {
                   name="batch"
                   value={formData.batch}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition-colors"
+                  className="input-dark"
                   placeholder="e.g., 2024"
                 />
               </div>
@@ -167,12 +167,12 @@ export default function Profile() {
 
         {/* Additional Info */}
         <div className="grid md:grid-cols-2 gap-6 mt-8">
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h3 className="text-lg font-semibold text-white mb-4">Account Details</h3>
+          <div className="card-dark p-6">
+            <h3 className="text-lg font-semibold text-slate-200 mb-4">Account Details</h3>
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-slate-400">Email</p>
-                <p className="text-white font-medium">{user.email}</p>
+                <p className="text-slate-200 font-medium">{user.email}</p>
               </div>
               <div>
                 <p className="text-slate-400">Role</p>
@@ -180,17 +180,17 @@ export default function Profile() {
               </div>
               <div>
                 <p className="text-slate-400">Member Since</p>
-                <p className="text-white font-medium">{new Date(user.createdAt).toLocaleDateString()}</p>
+                <p className="text-slate-200 font-medium">{new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h3 className="text-lg font-semibold text-white mb-4">Status</h3>
+          <div className="card-dark p-6">
+            <h3 className="text-lg font-semibold text-slate-200 mb-4">Status</h3>
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-slate-400">Account Status</p>
-                <p className="text-white font-medium">
+                <p className="text-slate-200 font-medium">
                   {user.isActive ? (
                     <span className="text-green-400">Active</span>
                   ) : (
@@ -200,7 +200,7 @@ export default function Profile() {
               </div>
               <div>
                 <p className="text-slate-400">Last Seen</p>
-                <p className="text-white font-medium">{new Date(user.lastSeen).toLocaleDateString()}</p>
+                <p className="text-slate-200 font-medium">{new Date(user.lastSeen).toLocaleDateString()}</p>
               </div>
             </div>
           </div>

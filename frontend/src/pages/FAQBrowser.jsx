@@ -7,10 +7,31 @@ import api from '../utils/api'
 
 const CATEGORIES = ['All', 'NOC', 'Offer Letter', 'ViBe', 'Rosetta', 'Team Formation', 'Coursework', 'Mentor Support', 'AI/Yaksha', 'Certificate', 'Timing', 'About', 'General']
 
-function FAQItem({ faq }) {
+function Highlight({ text, term }) {
+  if (!term || !term.trim()) return <>{text}</>
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+  const parts = text.split(regex)
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part)
+          ? <mark key={i} className="bg-amber-400/30 text-amber-200 rounded px-0.5">{part}</mark>
+          : part
+      )}
+    </>
+  )
+}
+
+function getSummary(answer) {
+  const first = answer.split(/[.\n]/)[0].trim()
+  return first.length > 120 ? first.slice(0, 117) + '…' : first + (answer.length > first.length ? '…' : '')
+}
+
+function FAQItem({ faq, searchTerm }) {
   const [open, setOpen] = useState(false)
   const importanceColor = { critical: 'rose', high: 'amber', medium: 'blue', low: 'slate' }
   const c = importanceColor[faq.importance] || 'slate'
+  const summary = getSummary(faq.answer)
 
   return (
     <div className="card-dark overflow-hidden">
@@ -22,7 +43,14 @@ function FAQItem({ faq }) {
             <span className="badge-category">{faq.category}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full bg-${c}-500/10 text-${c}-400 border border-${c}-500/20`}>{faq.importance}</span>
           </div>
-          <p className="text-sm font-medium text-slate-200">{faq.question}</p>
+          <p className="text-sm font-medium text-slate-200">
+            <Highlight text={faq.question} term={searchTerm} />
+          </p>
+          {!open && (
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              <Highlight text={summary} term={searchTerm} />
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-xs text-slate-600">{faq.usageCount} uses</span>
@@ -32,7 +60,9 @@ function FAQItem({ faq }) {
       {open && (
         <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }}
           className="border-t border-dark-500/50 px-4 py-4">
-          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{faq.answer}</p>
+          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+            <Highlight text={faq.answer} term={searchTerm} />
+          </p>
           {faq.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               {faq.tags.map(t => <span key={t} className="text-xs text-slate-600 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
@@ -49,25 +79,27 @@ export function FAQBrowser() {
   const [faqs, setFaqs] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
   const [category, setCategory] = useState(searchParams.get('category') || 'All')
   const [total, setTotal] = useState(0)
 
-  useEffect(() => { fetchFAQs() }, [category])
+  useEffect(() => { fetchFAQs(search) }, [category])
 
-  const fetchFAQs = async () => {
+  const fetchFAQs = async (term) => {
     setLoading(true)
     try {
       const params = { limit: 100 }
       if (category !== 'All') params.category = category
-      if (search) params.search = search
+      if (term) params.search = term
       const res = await api.get('/faq', { params })
       setFaqs(res.data.faqs)
       setTotal(res.data.total)
+      setActiveSearch(term || '')
     } catch (e) { console.error(e) }
     setLoading(false)
   }
 
-  const handleSearch = (e) => { e.preventDefault(); fetchFAQs() }
+  const handleSearch = (e) => { e.preventDefault(); fetchFAQs(search) }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -102,7 +134,7 @@ export function FAQBrowser() {
           ? Array(8).fill(0).map((_, i) => <div key={i} className="card-dark h-14 animate-pulse" />)
           : faqs.length === 0
             ? <div className="text-center py-16 text-slate-500">No FAQs found</div>
-            : faqs.map(faq => <FAQItem key={faq._id} faq={faq} />)
+            : faqs.map(faq => <FAQItem key={faq._id} faq={faq} searchTerm={activeSearch} />)
         }
       </div>
     </div>

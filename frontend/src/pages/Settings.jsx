@@ -39,24 +39,24 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-12">
+    <div className="min-h-screen p-6 md:p-12">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Settings</h1>
+          <h1 className="text-4xl font-bold text-slate-100 mb-2">Settings</h1>
           <p className="text-slate-400">Customize your experience</p>
         </div>
 
         {/* Settings Sections */}
         <div className="space-y-6">
           {/* Appearance */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h2 className="text-xl font-bold text-white mb-6">Appearance</h2>
+          <div className="card-dark p-6">
+            <h2 className="text-xl font-bold text-slate-100 mb-6">Appearance</h2>
             
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-6 border-b border-slate-700">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Dark Mode</h3>
+                  <h3 className="text-lg font-semibold text-slate-200">Dark Mode</h3>
                   <p className="text-sm text-slate-400 mt-1">Toggle between light and dark themes</p>
                 </div>
                 <button
@@ -75,14 +75,14 @@ export default function Settings() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Theme Preference</h3>
+                <h3 className="text-lg font-semibold text-slate-200 mb-3">Theme Preference</h3>
                 <div className="space-y-3">
                   {[
                     { value: 'light', label: '☀️ Light', desc: 'Light theme for bright environments' },
                     { value: 'dark', label: '🌙 Dark', desc: 'Dark theme for comfortable viewing' },
                     { value: 'system', label: '🖥️ System', desc: 'Follow system preferences' }
                   ].map(option => (
-                    <label key={option.value} className="flex items-center gap-4 p-3 bg-slate-700/50 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors">
+                    <label key={option.value} className="flex items-center gap-4 p-3 bg-dark-600/50 rounded-lg cursor-pointer hover:bg-dark-600 transition-colors">
                       <input
                         type="radio"
                         name="theme"
@@ -93,7 +93,7 @@ export default function Settings() {
                         className="w-4 h-4"
                       />
                       <div>
-                        <p className="text-white font-medium">{option.label}</p>
+                        <p className="text-slate-200 font-medium">{option.label}</p>
                         <p className="text-xs text-slate-400">{option.desc}</p>
                       </div>
                     </label>
@@ -104,11 +104,11 @@ export default function Settings() {
           </div>
 
           {/* AI Interaction */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h2 className="text-xl font-bold text-white mb-6">AI Interaction</h2>
+          <div className="card-dark p-6">
+            <h2 className="text-xl font-bold text-slate-100 mb-6">AI Interaction</h2>
             
             <div>
-              <h3 className="text-lg font-semibold text-white mb-3">Explanation Level</h3>
+              <h3 className="text-lg font-semibold text-slate-200 mb-3">Explanation Level</h3>
               <p className="text-sm text-slate-400 mb-4">Choose how detailed AI explanations should be</p>
               <div className="space-y-3">
                 {[
@@ -116,7 +116,7 @@ export default function Settings() {
                   { value: 'intermediate', label: '📚 Intermediate', desc: 'Balanced explanations (Recommended)' },
                   { value: 'detailed', label: '🧑‍🎓 Detailed', desc: 'In-depth technical explanations' }
                 ].map(option => (
-                  <label key={option.value} className="flex items-center gap-4 p-3 bg-slate-700/50 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors">
+                  <label key={option.value} className="flex items-center gap-4 p-3 bg-dark-600/50 rounded-lg cursor-pointer hover:bg-dark-600 transition-colors">
                     <input
                       type="radio"
                       name="explainMode"
@@ -127,7 +127,7 @@ export default function Settings() {
                       className="w-4 h-4"
                     />
                     <div>
-                      <p className="text-white font-medium">{option.label}</p>
+                      <p className="text-slate-200 font-medium">{option.label}</p>
                       <p className="text-xs text-slate-400">{option.desc}</p>
                     </div>
                   </label>
@@ -137,13 +137,13 @@ export default function Settings() {
           </div>
 
           {/* Notifications */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h2 className="text-xl font-bold text-white mb-6">Notifications</h2>
+          <div className="card-dark p-6">
+            <h2 className="text-xl font-bold text-slate-100 mb-6">Notifications</h2>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Enable Notifications</h3>
+                  <h3 className="text-lg font-semibold text-slate-200">Enable Notifications</h3>
                   <p className="text-sm text-slate-400 mt-1">Get alerts for important updates and messages</p>
                 </div>
                 <button
@@ -162,7 +162,7 @@ export default function Settings() {
               </div>
 
               {preferences.notifications && (
-                <div className="bg-slate-700/50 rounded-lg p-4 text-sm text-slate-300">
+                <div className="bg-dark-600/50 rounded-lg p-4 text-sm text-slate-300">
                   <p className="mb-2 font-medium">You'll receive notifications for:</p>
                   <ul className="space-y-1 text-xs">
                     <li>✓ Answers to your queries</li>
@@ -176,26 +176,26 @@ export default function Settings() {
           </div>
 
           {/* Privacy & Security */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h2 className="text-xl font-bold text-white mb-6">Privacy & Security</h2>
+          <div className="card-dark p-6">
+            <h2 className="text-xl font-bold text-slate-100 mb-6">Privacy & Security</h2>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-4 border-b border-slate-700">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Change Password</h3>
+                  <h3 className="text-lg font-semibold text-slate-200">Change Password</h3>
                   <p className="text-sm text-slate-400 mt-1">Update your account password regularly</p>
                 </div>
-                <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                <button className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
                   Change
                 </button>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Two-Factor Authentication</h3>
+                  <h3 className="text-lg font-semibold text-slate-200">Two-Factor Authentication</h3>
                   <p className="text-sm text-slate-400 mt-1">Add an extra layer of security</p>
                 </div>
-                <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                <button className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
                   Enable
                 </button>
               </div>
@@ -203,14 +203,14 @@ export default function Settings() {
           </div>
 
           {/* Account Actions */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur">
-            <h2 className="text-xl font-bold text-white mb-6">Account</h2>
+          <div className="card-dark p-6">
+            <h2 className="text-xl font-bold text-slate-100 mb-6">Account</h2>
             
             <div className="space-y-3">
-              <button className="w-full px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-left font-medium">
+              <button className="w-full px-4 py-3 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors text-left font-medium">
                 📥 Download Your Data
               </button>
-              <button className="w-full px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-left font-medium">
+              <button className="w-full px-4 py-3 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors text-left font-medium">
                 🔒 Deactivate Account
               </button>
               <button className="w-full px-4 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-left font-medium">

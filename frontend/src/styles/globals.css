@@ -14,8 +14,80 @@
     background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
   }
   body.light {
-    @apply bg-slate-50 text-slate-900;
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(0,0,0,0.04)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
+    @apply bg-slate-100 text-slate-800;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(0,0,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Light mode component overrides ── */
+  body.light .card-dark {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+    color: #1e293b;
+  }
+  body.light .card-dark button:hover {
+    background-color: rgba(241,245,249,0.8) !important;
+  }
+  body.light .input-dark {
+    background-color: #ffffff;
+    border-color: #cbd5e1;
+    color: #1e293b;
+  }
+  body.light .input-dark::placeholder { color: #94a3b8; }
+  body.light .input-dark:focus { border-color: rgba(59,130,246,0.6); }
+  body.light .btn-secondary {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+  }
+  body.light .btn-secondary:hover {
+    background-color: #e2e8f0;
+    color: #1e293b;
+  }
+  body.light .btn-ghost {
+    color: #64748b;
+  }
+  body.light .btn-ghost:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+  }
+  body.light .badge-category {
+    background-color: rgba(59,130,246,0.08);
+    color: #2563eb;
+    border-color: rgba(59,130,246,0.25);
+  }
+
+  body.light .text-slate-100 { color: #0f172a !important; }
+  body.light .text-slate-200 { color: #1e293b !important; }
+  body.light .text-slate-300 { color: #334155 !important; }
+  body.light h1, body.light h2, body.light h3 { color: #0f172a !important; }
+  body.light p { color: #334155; }
+  body.light .text-slate-300 { color: #334155 !important; }
+  body.light .text-slate-400 { color: #475569 !important; }
+  body.light .text-slate-500 { color: #64748b !important; }
+  body.light .text-slate-600 { color: #64748b !important; }
+  body.light .text-white { color: #0f172a !important; }
+  body.light .border-dark-500\/50 { border-color: #e2e8f0 !important; }
+  body.light .bg-dark-600 { background-color: #f1f5f9 !important; }
+  body.light .bg-dark-700 { background-color: #ffffff !important; }
+  body.light .bg-dark-800 { background-color: #f8fafc !important; }
+  body.light .bg-dark-800\/80 { background-color: rgba(248,250,252,0.92) !important; }
+  body.light .border-dark-500\/50 { border-color: #e2e8f0 !important; }
+  body.light .border-dark-400 { border-color: #cbd5e1 !important; }
+  body.light .hover\:bg-dark-600:hover { background-color: #f1f5f9 !important; }
+  body.light .hover\:bg-dark-600\/40:hover { background-color: rgba(241,245,249,0.8) !important; }
+  body.light aside { background-color: #f8fafc !important; border-color: #e2e8f0 !important; }
+  body.light header { background-color: rgba(248,250,252,0.92) !important; border-color: #e2e8f0 !important; }
+  body.light ::-webkit-scrollbar-track { background: #f1f5f9; }
+  body.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+
+  body.light .bg-dark-600\/50 { background-color: rgba(241,245,249,0.8) !important; }
+  body.light .bg-dark-600\/50:hover { background-color: #e2e8f0 !important; }
+  body.light .hover\:bg-dark-600:hover { background-color: #e2e8f0 !important; }
+  body.light mark {
+    background-color: rgba(245, 158, 11, 0.4);
+    color: #92400e;
+    border-radius: 2px;
+    padding: 0 2px;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
