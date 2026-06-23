@@ -7,14 +7,42 @@ import api from '../utils/api'
 
 const CATEGORIES = ['All', 'NOC', 'Offer Letter', 'ViBe', 'Rosetta', 'Team Formation', 'Coursework', 'Mentor Support', 'AI/Yaksha', 'Certificate', 'Timing', 'About', 'General']
 
-function FAQItem({ faq }) {
+function FAQItem({ faq, onView }) {
+
   const [open, setOpen] = useState(false)
   const importanceColor = { critical: 'rose', high: 'amber', medium: 'blue', low: 'slate' }
   const c = importanceColor[faq.importance] || 'slate'
 
   return (
     <div className="card-dark overflow-hidden">
-      <button onClick={() => setOpen(o => !o)}
+      <button
+  onClick={() => {
+    setOpen(o => !o)
+
+    let recent = JSON.parse(
+      localStorage.getItem('recentFAQs') || '[]'
+    )
+
+    recent = recent.filter(
+      item => item._id !== faq._id
+    )
+
+    recent.unshift({
+      _id: faq._id,
+      question: faq.question
+    })
+
+    recent = recent.slice(0, 5)
+
+    localStorage.setItem(
+      'recentFAQs',
+      JSON.stringify(recent)
+    )
+
+    window.dispatchEvent(
+      new Event('recentFAQUpdated')
+    )
+  }}
         className="w-full flex items-start gap-4 p-4 text-left hover:bg-dark-600/40 transition-colors">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -51,8 +79,33 @@ export function FAQBrowser() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState(searchParams.get('category') || 'All')
   const [total, setTotal] = useState(0)
+  const [recentFAQs, setRecentFAQs] = useState([])
+  
+useEffect(() => {
+  fetchFAQs()
 
-  useEffect(() => { fetchFAQs() }, [category])
+  const loadRecent = () => {
+    const recent = JSON.parse(
+      localStorage.getItem('recentFAQs') || '[]'
+    )
+    setRecentFAQs(recent)
+  }
+
+  loadRecent()
+
+  window.addEventListener(
+    'recentFAQUpdated',
+    loadRecent
+  )
+
+  return () => {
+    window.removeEventListener(
+      'recentFAQUpdated',
+      loadRecent
+    )
+  }
+}, [category])
+  
 
   const fetchFAQs = async () => {
     setLoading(true)
@@ -96,6 +149,25 @@ export function FAQBrowser() {
             }`}>{c}</button>
         ))}
       </div>
+      {recentFAQs.length > 0 && (
+  <div className="card-dark p-4 mb-6">
+    <h3 className="text-white font-semibold mb-3">
+      Recently Viewed FAQs
+    </h3>
+
+    <div className="space-y-2">
+      {recentFAQs.map(item => (
+        <div
+          key={item._id}
+          className="text-sm text-slate-300 bg-dark-700 p-2 rounded"
+        >
+          {item.question}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+      
 
       <div className="space-y-2">
         {loading
