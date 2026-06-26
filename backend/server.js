@@ -29,7 +29,7 @@ app.use(cors({
       'https://web.vxrachit.dpdns.org',
       'https://web.vxrachit.is-a.dev'
     ];
-    
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

@@ -245,4 +245,34 @@ router.patch('/:id/escalate', protect, async (req, res) => {
   }
 });
 
+// POST: /api/queries/feedback
+// Automatically routes bad AI answers to the Answer Queue
+router.post('/feedback', async (req, res) => {
+  try {
+    const { studentId, question, aiAnswer, isHelpful } = req.body;
+
+    if (!isHelpful) {
+      // The AI hallucinated. Route to the human Answer Queue.
+      const newQuery = new Query({
+        author: studentId || null, // Matches your existing schema setup
+        question: question,
+        aiDraftAnswer: aiAnswer,
+        status: 'open', // 'open' usually signifies it needs human attention
+        source: 'AI_Hallucination_Flag',
+        skipCount: 0,
+        isStalled: false
+      });
+
+      await newQuery.save();
+      return res.status(201).json({ message: "Bad AI answer routed to human mentors." });
+    }
+
+    return res.status(200).json({ message: "Positive feedback recorded." });
+
+  } catch (error) {
+    console.error("Feedback error:", error);
+    return res.status(500).json({ error: "Failed to process feedback." });
+  }
+});
+
 module.exports = router;

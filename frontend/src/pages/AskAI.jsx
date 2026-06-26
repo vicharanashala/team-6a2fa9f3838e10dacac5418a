@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Send, ChevronDown, ChevronUp, Sparkles, BookOpen, ArrowUpRight,
-         ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle, Info, Zap, Copy, RotateCcw } from 'lucide-react'
+import {
+  Brain, Send, ChevronDown, ChevronUp, Sparkles, BookOpen, ArrowUpRight,
+  ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle, Info, Zap, Copy, RotateCcw
+} from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
@@ -77,6 +79,41 @@ function TypingAnimation() {
   )
 }
 
+//  NEW COMPONENT: The hallucination feedback buttons
+const MessageFeedback = ({ message, onFeedback }) => {
+  const [voted, setVoted] = useState(false);
+
+  const handleVote = (isHelpful) => {
+    if (voted) return;
+    setVoted(true);
+    onFeedback(message.question, message.text, isHelpful);
+  };
+
+  if (voted) {
+    return <div className="flex items-center text-xs text-emerald-500 gap-1.5 mt-4 pt-3 border-t border-dark-500/30"><CheckCircle size={14} /> Feedback sent to mentors</div>;
+  }
+
+  return (
+    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-dark-500/30">
+      <span className="text-xs text-slate-500 mr-2">Rate AI Answer:</span>
+      <button
+        onClick={() => handleVote(true)}
+        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+        title="Accurate and helpful"
+      >
+        <ThumbsUp size={14} />
+      </button>
+      <button
+        onClick={() => handleVote(false)}
+        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+        title="Hallucination or inaccurate"
+      >
+        <ThumbsDown size={14} />
+      </button>
+    </div>
+  );
+};
+
 export default function AskAI() {
   const { user } = useAuthStore()
   const [searchParams] = useSearchParams()
@@ -107,12 +144,12 @@ export default function AskAI() {
       if (!query) toast.error('Please enter a question')
       return
     }
-    
+
     if (query.length < 3) {
       toast.error('Question must be at least 3 characters')
       return
     }
-    
+
     setLoading(true)
     setResult(null)
     try {
@@ -134,8 +171,28 @@ export default function AskAI() {
       await api.post('/ai/feedback', { faqId, helpful })
       setFeedback(f => ({ ...f, [faqId]: helpful ? 'up' : 'down' }))
       toast.success(helpful ? 'Marked as helpful!' : 'Feedback recorded.')
-    } catch (e) {}
+    } catch (e) { }
   }
+
+  //  NEW FUNCTION: Connects to the backend route we just built
+  const handleAIFeedback = async (questionText, aiAnswerText, isHelpful) => {
+    try {
+      await api.post('/queries/feedback', {
+        question: questionText,
+        aiAnswer: aiAnswerText,
+        isHelpful: isHelpful,
+      });
+
+      if (!isHelpful) {
+        toast.error("Flagged! Sent to the mentor Answer Queue.");
+      } else {
+        toast.success("Thanks! Glad the AI was helpful.");
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast.error("Failed to submit feedback");
+    }
+  };
 
   const copyAnswer = () => {
     navigator.clipboard.writeText(result?.answer || '')
@@ -168,11 +225,10 @@ export default function AskAI() {
           <div className="flex gap-2">
             {EXPLAIN_MODES.map(m => (
               <button key={m.value} onClick={() => setExplainMode(m.value)}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  explainMode === m.value
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${explainMode === m.value
                     ? 'bg-blue-600/20 border-blue-500/40 text-blue-400'
                     : 'border-dark-500 text-slate-500 hover:text-slate-300 hover:border-dark-400'
-                }`}>
+                  }`}>
                 {m.label}
               </button>
             ))}
@@ -252,6 +308,11 @@ export default function AskAI() {
               <div className="p-5">
                 <div className="prose prose-invert prose-sm max-w-none">
                   <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                  {/*  NEW INJECTION: Rendering the AI Feedback UI directly below the answer */}
+                  <MessageFeedback
+                    message={{ question: result.question, text: result.answer }}
+                    onFeedback={handleAIFeedback}
+                  />
                 </div>
               </div>
 
