@@ -33,6 +33,11 @@ function FAQItem({ faq, searchTerm }) {
   const c = importanceColor[faq.importance] || 'slate'
   const summary = getSummary(faq.answer)
 
+  const readTime = Math.max(
+  1,
+  Math.ceil(faq.answer.trim().split(/\s+/).length / 200)
+)
+
   return (
     <div className="card-dark overflow-hidden">
       <button
@@ -70,6 +75,9 @@ function FAQItem({ faq, searchTerm }) {
             <span className="badge-category">{faq.category}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full bg-${c}-500/10 text-${c}-400 border border-${c}-500/20`}>{faq.importance}</span>
           </div>
+                     <p className="text-xs text-slate-500 mb-1">
+  ⏱️ {readTime} min read
+</p>
           <p className="text-sm font-medium text-slate-200">
             <Highlight text={faq.question} term={searchTerm} />
           </p>
