@@ -115,7 +115,7 @@ export function Announcements() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/announcements').then(r => setAnnouncements(r.data)).catch(() => {}).finally(() => setLoading(false))
+    api.get('/announcements').then(r => setAnnouncements(Array.isArray(r.data) ? r.data : r.data?.announcements || [])).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   const priorityConfig = {
@@ -179,7 +179,7 @@ export function Profile() {
   const { user } = require('../store').useAuthStore()
   const [myQueries, setMyQueries] = useState([])
   useEffect(() => {
-    api.get('/users/my-queries').then(r => setMyQueries(r.data)).catch(() => {})
+    api.get('/users/my-queries').then(r => setMyQueries(Array.isArray(r.data) ? r.data : r.data?.queries || [])).catch(() => {})
   }, [])
 
   return (
