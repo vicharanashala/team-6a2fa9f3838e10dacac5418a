@@ -105,7 +105,7 @@ function EscalationRow({ query, onResolve, onAssign }) {
                 <p className="text-sm text-slate-300">{query.content}</p>
               </div>
               {query.aiAnswer && (
-                <div className="bg-dark-700 rounded-xl p-3">
+                <div className="bg-dark-700/50 rounded-xl p-3">
                   <p className="text-xs text-slate-500 mb-1.5 font-medium">AI Answer</p>
                   <p className="text-sm text-slate-300 line-clamp-3">{query.aiAnswer.content}</p>
                   <div className="flex gap-2 mt-2">
@@ -134,7 +134,7 @@ function EscalationRow({ query, onResolve, onAssign }) {
                 <p className="text-xs text-slate-500 mb-2 font-medium">Assign Mentor</p>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={loadMentors}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-dark-500 text-slate-500 bg-dark-700 hover:text-slate-300 transition-all">
+                    className="text-xs px-3 py-1.5 rounded-lg border transition-all filter-btn">
                     Load Mentors
                   </button>
                   {mentors.map(m => (
@@ -233,11 +233,11 @@ export default function AdminEscalations() {
         className="flex items-center gap-4 flex-wrap">
         <div className="flex gap-2">
           <button onClick={() => setFilter('escalated')}
-            className={`text-sm px-4 py-2 rounded-xl border transition-all ${filter === 'escalated' ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+            className={`text-sm px-4 py-2 rounded-xl border transition-all ${filter === 'escalated' ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' : 'filter-btn'}`}>
             <AlertTriangle size={13} className="inline mr-1.5" />Escalated Only
           </button>
           <button onClick={() => setFilter('all')}
-            className={`text-sm px-4 py-2 rounded-xl border transition-all ${filter === 'all' ? 'bg-blue-500/15 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+            className={`text-sm px-4 py-2 rounded-xl border transition-all ${filter === 'all' ? 'bg-blue-500/15 border-blue-500/30 text-blue-400' : 'filter-btn'}`}>
             <MessageSquare size={13} className="inline mr-1.5" />All Queries
           </button>
         </div>

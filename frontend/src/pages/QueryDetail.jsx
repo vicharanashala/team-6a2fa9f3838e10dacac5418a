@@ -155,7 +155,7 @@ function AnswerCard({ answer, onVote, user, onAddToKB }) {
         </div>
       </div>
 
-      <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap ml-11">{answer.content}</div>
+      <div className="text-slate-200 dark:text-slate-800 text-sm leading-relaxed whitespace-pre-wrap ml-11">{answer.content}</div>
 
       <div className="flex items-center gap-3 mt-4 ml-11">
         <button onClick={() => onVote(answer._id, 'up')}
@@ -282,7 +282,7 @@ export default function QueryDetail() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       {/* Back */}
-      <button onClick={() => navigate('/discussions')} className="flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors text-sm">
+      <button onClick={() => navigate('/discussions')} className="flex items-center gap-2 text-slate-500 dark:text-slate-600 hover:text-slate-300 dark:hover:text-slate-700 transition-colors text-sm detail-back-btn">
         <ArrowLeft size={16} /> Back to Discussions
       </button>
 
@@ -299,14 +299,14 @@ export default function QueryDetail() {
             </span>
           )}
         </div>
-        <h1 className="text-xl font-bold text-white mb-2">{query.refinedTitle || query.title}</h1>
+        <h1 className="text-xl font-bold dark:text-white mb-2 discussions-title">{query.refinedTitle || query.title}</h1>
         {query.refinedTitle && query.refinedTitle !== query.title && (
           <p className="text-xs text-slate-600 mb-3">Original: "{query.title}"</p>
         )}
         <p className="text-slate-300 leading-relaxed">{query.content}</p>
 
         <div className="flex items-center justify-between mt-5 pt-4 border-t border-dark-500/50">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-600 discussions-meta">
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white text-[10px] font-bold">
               {query.author?.name?.charAt(0).toUpperCase()}
             </div>
@@ -336,7 +336,7 @@ export default function QueryDetail() {
       {/* Related FAQs */}
       {query.relatedFAQs?.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-medium text-slate-400 dark:text-slate-600 mb-3 flex items-center gap-2 discussions-section-title">
             <BookOpen size={14} /> Related FAQ entries
           </h3>
           <div className="grid gap-2">
@@ -356,13 +356,13 @@ export default function QueryDetail() {
 
       {/* Community Answers */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-semibold dark:text-white discussions-section-title mb-4 flex items-center gap-2">
           Answers <span className="text-sm text-slate-500 font-normal">({query.answers?.length || 0})</span>
         </h3>
         {query.answers?.length === 0
           ? (
             <div className="card-dark p-8 text-center">
-              <p className="text-slate-500">No community answers yet. Be the first to help!</p>
+              <p className="text-slate-500 dark:text-slate-600 detail-no-answers">No community answers yet. Be the first to help!</p>
             </div>
           )
           : (
@@ -379,7 +379,7 @@ export default function QueryDetail() {
       {/* Add Answer */}
       {token && (
         <div className="card-dark p-5">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white mb-4 flex items-center gap-2 detail-answer-label">
             <Plus size={16} /> Your Answer
           </h3>
           <form onSubmit={handleAnswer}>

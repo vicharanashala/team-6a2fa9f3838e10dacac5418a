@@ -97,7 +97,7 @@ export function FAQBrowser() {
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCategory(c)}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              category === c ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700 hover:text-slate-300'
+              category === c ? 'filter-btn-active' : 'filter-btn'
             }`}>{c}</button>
         ))}
       </div>
@@ -216,7 +216,7 @@ export function Profile() {
           <h3 className="font-semibold text-white mb-4">My Queries ({myQueries.length})</h3>
           <div className="space-y-2">
             {myQueries.map(q => (
-              <div key={q._id} className="flex items-center justify-between p-3 bg-dark-700 rounded-xl">
+              <div key={q._id} className="flex items-center justify-between p-3 bg-dark-700/60 rounded-xl faq-related-card">
                 <span className="text-sm text-slate-300 truncate flex-1">{q.title}</span>
                 <span className="badge-category ml-2">{q.status}</span>
               </div>
@@ -259,7 +259,7 @@ export function Settings() {
               <div className="flex gap-2">
                 {['beginner', 'intermediate', 'detailed'].map(m => (
                   <button key={m} onClick={() => setPrefs(p => ({ ...p, explainMode: m }))}
-                    className={`flex-1 py-2 rounded-xl text-sm border transition-all capitalize ${prefs.explainMode === m ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+                    className={`flex-1 py-2 rounded-xl text-sm border transition-all capitalize explain-mode-btn ${prefs.explainMode === m ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500/50 text-slate-500 bg-dark-700/60'}`}>
                     {m}
                   </button>
                 ))}
@@ -268,7 +268,7 @@ export function Settings() {
             <div className="flex items-center justify-between">
               <div><p className="text-sm text-slate-300">Notifications</p><p className="text-xs text-slate-500">Receive platform updates</p></div>
               <button onClick={() => setPrefs(p => ({ ...p, notifications: !p.notifications }))}
-                className={`w-12 h-6 rounded-full border transition-all relative ${prefs.notifications ? 'bg-blue-600 border-blue-500' : 'bg-dark-600 border-dark-500'}`}>
+                className={`w-12 h-6 rounded-full border transition-all relative ${prefs.notifications ? 'toggle-track-on' : 'toggle-track-off'}`}>
                 <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${prefs.notifications ? 'left-6' : 'left-0.5'}`} />
               </button>
             </div>

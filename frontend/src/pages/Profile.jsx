@@ -35,8 +35,8 @@ export default function Profile() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="h-8 w-32 bg-dark-700 rounded animate-pulse mx-auto mb-2" />
-          <div className="h-4 w-48 bg-dark-700 rounded animate-pulse mx-auto" />
+          <div className="h-8 w-32 skeleton-base rounded animate-pulse mx-auto mb-2" />
+          <div className="h-4 w-48 skeleton-base rounded animate-pulse mx-auto" />
         </div>
       </div>
     );
@@ -78,7 +78,7 @@ export default function Profile() {
               { label: 'Bookmarks', value: stats.bookmarks, color: 'text-white' },
               { label: 'Reputation', value: stats.reputation, color: 'text-blue-400' },
             ].map(s => (
-              <div key={s.label} className="bg-dark-700/60 rounded-xl p-4 text-center">
+              <div key={s.label} className="bg-dark-700/60 rounded-xl p-4 text-center preference-card">
                 <p className="text-2xl font-bold text-white">{s.value}</p>
                 <p className="text-xs text-slate-500 mt-1">{s.label}</p>
               </div>

@@ -70,7 +70,7 @@ function AnnouncementModal({ existing, onClose, onSave }) {
               <div className="flex gap-2">
                 {PRIORITIES.map(p => (
                   <button type="button" key={p} onClick={() => setForm(f => ({ ...f, priority: p }))}
-                    className={`text-xs px-3 py-1.5 rounded-lg border capitalize transition-all ${form.priority === p ? priorityColors[p] : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+                    className={`text-xs px-3 py-1.5 rounded-lg border capitalize transition-all ${form.priority === p ? priorityColors[p] : 'filter-btn'}`}>
                     {p}
                   </button>
                 ))}
@@ -199,11 +199,11 @@ export default function AdminAnnouncements() {
       {/* Toggle */}
       <div className="flex items-center gap-3">
         <button onClick={() => setShowAll(false)}
-          className={`text-sm px-3 py-1.5 rounded-lg border transition-all ${!showAll ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+          className={`text-sm px-3 py-1.5 rounded-lg border transition-all ${!showAll ? 'filter-btn-active' : 'filter-btn'}`}>
           Active Only
         </button>
         <button onClick={() => setShowAll(true)}
-          className={`text-sm px-3 py-1.5 rounded-lg border transition-all ${showAll ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700'}`}>
+          className={`text-sm px-3 py-1.5 rounded-lg border transition-all ${showAll ? 'filter-btn-active' : 'filter-btn'}`}>
           Show All (incl. deleted)
         </button>
       </div>

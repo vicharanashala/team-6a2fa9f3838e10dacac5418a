@@ -41,22 +41,22 @@ export default function AdminLayout({ children }) {
           <p className="text-xs text-rose-400/60">You have full administrative access</p>
         </div>
         <button onClick={() => navigate('/home')}
-          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors active:scale-95 px-3 py-1.5 rounded-lg hover:bg-dark-600">
+          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors active:scale-95 px-3 py-1.5 rounded-lg hover:bg-slate-100">
           <ArrowLeft size={13} /> Back to App
         </button>
       </motion.div>
 
       {/* Admin Nav — sticky */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-        className="flex gap-2 flex-wrap sticky top-2 z-10 bg-dark-900/80 backdrop-blur-md p-1.5 rounded-2xl border border-dark-500/30"
+        className="flex gap-2 flex-wrap sticky top-2 z-10 backdrop-blur-md p-1.5 rounded-2xl admin-topbar border-dark-500/30"
         style={typeof document !== 'undefined' && document.body.classList.contains('dark') ? {} : { background: 'rgba(241,245,249,0.9)' }}>
         {adminNavItems.map(({ to, icon: Icon, label, end }) => (
           <NavLink key={to} to={to} end={end}
             className={({ isActive }) =>
               `flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-sm active:scale-95 ${
                 isActive
-                  ? 'bg-violet-600/20 border-violet-500/40 text-violet-300 shadow-sm'
-                  : 'border-dark-500/40 text-slate-400 hover:text-slate-200 hover:bg-dark-600/70 bg-dark-700/50'
+                  ? 'admin-sidebar-link-active'
+                  : 'admin-sidebar-link'
               }`
             }>
             <Icon size={14} />

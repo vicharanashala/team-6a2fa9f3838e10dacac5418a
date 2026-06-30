@@ -31,7 +31,7 @@ function ConfidenceBadge({ level, score }) {
 function SourceCard({ section, category, question, similarity }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-dark-700 border border-dark-500/50 rounded-xl overflow-hidden">
+    <div className="source-card border border-dark-500/50 rounded-xl overflow-hidden">
       <button onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-dark-600/50 transition-colors">
         <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
@@ -39,19 +39,19 @@ function SourceCard({ section, category, question, similarity }) {
         </div>
         <div className="flex-1 min-w-0">
           {section && <span className="text-xs font-mono text-blue-400 mr-2">§{section}</span>}
-          <span className="text-sm text-slate-300 truncate">{question?.substring(0, 60)}...</span>
+          <span className="text-sm text-slate-300 dark:text-slate-700 truncate">{question?.substring(0, 60)}...</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-600">{similarity?.toFixed(0)}% match</span>
+          <span className="text-xs text-slate-600 dark:text-slate-500">{similarity?.toFixed(0)}% match</span>
           {open ? <ChevronUp size={14} className="text-slate-500" /> : <ChevronDown size={14} className="text-slate-500" />}
         </div>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-            className="overflow-hidden border-t border-dark-500/50">
-            <div className="px-4 py-3">
-              <p className="text-sm font-medium text-slate-300 mb-1">{question}</p>
+            className="overflow-hidden source-hdr border-t border-dark-500/50">
+            <div className="px-4 py-3 source-card-body">
+              <p className="text-sm font-medium text-slate-300 dark:text-slate-800 mb-1">{question}</p>
               <span className="badge-category">{category}</span>
             </div>
           </motion.div>
@@ -67,8 +67,8 @@ function TypingAnimation() {
       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center flex-shrink-0">
         <Brain size={16} className="text-white" />
       </div>
-      <div className="bg-dark-700 rounded-2xl px-4 py-3 flex items-center gap-2">
-        <span className="text-sm text-slate-400">AI is analyzing similar FAQs</span>
+      <div className="typing-msg rounded-2xl px-4 py-3 flex items-center gap-2">
+        <span className="text-sm text-slate-400 dark:text-slate-600">AI is analyzing similar FAQs</span>
         <span className="flex gap-1">
           <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
         </span>
@@ -107,22 +107,17 @@ export default function AskAI() {
       if (!query) toast.error('Please enter a question')
       return
     }
-    
     if (query.length < 3) {
       toast.error('Question must be at least 3 characters')
       return
     }
-    
     setLoading(true)
     setResult(null)
     try {
-      console.log('📡 Asking AI:', { question: query, explainMode })
       const res = await api.post('/ai/ask', { question: query, explainMode })
-      console.log('✅ AI Response:', res.data)
       setResult({ ...res.data, question: query })
       setHistory(h => [{ question: query, result: res.data }, ...h.slice(0, 9)])
     } catch (err) {
-      console.error('❌ AI Error:', err.response?.data || err.message)
       const errorMsg = err.response?.data?.error || err.message || 'AI service unavailable. Please try again.'
       toast.error(errorMsg)
     }
@@ -156,22 +151,22 @@ export default function AskAI() {
           <Brain size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white">Ask AI</h1>
+          <h1 className="text-xl font-bold text-white dark:text-slate-900">Ask AI</h1>
           <p className="text-sm text-slate-500">RAG-powered · Grounded in internship FAQ · Zero hallucinations</p>
         </div>
       </div>
 
-      {/* Input */}
+      {/* Input Card */}
       <div className="card-dark p-5">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-slate-400">Explain mode:</span>
+          <span className="text-sm text-slate-400 dark:text-slate-600">Explain mode:</span>
           <div className="flex gap-2">
             {EXPLAIN_MODES.map(m => (
               <button key={m.value} onClick={() => setExplainMode(m.value)}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   explainMode === m.value
-                    ? 'bg-blue-600/20 border-blue-500/40 text-blue-400'
-                    : 'border-dark-500 text-slate-500 hover:text-slate-300 hover:border-dark-400'
+                    ? 'explain-btn-active'
+                    : 'explain-btn'
                 }`}>
                 {m.label}
               </button>
@@ -189,7 +184,7 @@ export default function AskAI() {
             <Send size={16} className="text-white" />
           </button>
         </div>
-        <p className="text-xs text-slate-600 mt-2">Ctrl+Enter to ask · Your question is matched against 180+ FAQ entries before AI generates a response</p>
+        <p className="text-xs text-slate-600 dark:text-slate-500 mt-2">Ctrl+Enter to ask · Your question is matched against 180+ FAQ entries before AI generates a response</p>
       </div>
 
       {/* Loading */}
@@ -199,10 +194,10 @@ export default function AskAI() {
             className="card-dark overflow-hidden">
             <TypingAnimation />
             <div className="px-5 pb-4">
-              <div className="flex gap-2 text-xs text-slate-500">
-                <span className="bg-dark-600 rounded px-2 py-1">Searching FAQs</span>
-                <span className="bg-dark-600 rounded px-2 py-1">Calculating similarity</span>
-                <span className="bg-dark-600 rounded px-2 py-1">Generating answer</span>
+              <div className="flex gap-2 text-xs text-slate-500 dark:text-slate-600">
+                <span className="step-badge rounded px-2 py-1">Searching FAQs</span>
+                <span className="step-badge rounded px-2 py-1">Calculating similarity</span>
+                <span className="step-badge rounded px-2 py-1">Generating answer</span>
               </div>
             </div>
           </motion.div>
@@ -215,7 +210,7 @@ export default function AskAI() {
           <motion.div ref={resultRef} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             className="space-y-4">
             {/* Answer Card */}
-            <div className="card-dark border-blue-500/15">
+            <div className="card-dark answer-border border-blue-500/15">
               {/* Header */}
               <div className="flex items-start justify-between p-5 pb-0">
                 <div className="flex items-center gap-2.5">
@@ -223,13 +218,13 @@ export default function AskAI() {
                     <Zap size={14} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-white">VINS AI</div>
+                    <div className="text-sm font-medium text-white dark:text-slate-900">VINS AI</div>
                     <div className="text-xs text-slate-500">Grounded in FAQ knowledge base</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <ConfidenceBadge level={result.confidence} score={result.confidenceScore} />
-                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-dark-600 transition-colors">
+                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 dark:hover:text-slate-700 hover:bg-dark-600 dark:hover:bg-slate-200 transition-colors copy-btn">
                     <Copy size={14} />
                   </button>
                 </div>
@@ -237,30 +232,30 @@ export default function AskAI() {
 
               {/* Confidence Bar */}
               <div className="px-5 pt-3">
-                <div className="h-1 bg-dark-600 rounded-full overflow-hidden">
+                <div className="confidence-track h-1 rounded-full overflow-hidden">
                   <motion.div initial={{ width: 0 }} animate={{ width: confidenceBarWidth }}
                     transition={{ delay: 0.3, duration: 0.8 }}
                     className="confidence-bar" />
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-xs text-slate-600">Confidence</span>
-                  <span className="text-xs text-slate-500">{result.confidenceScore?.toFixed(0)}% · Based on {result.sourceDetails?.length || 0} FAQs</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-500">Confidence</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-600">{result.confidenceScore?.toFixed(0)}% · Based on {result.sourceDetails?.length || 0} FAQs</span>
                 </div>
               </div>
 
               {/* Answer */}
               <div className="p-5">
-                <div className="prose prose-invert prose-sm max-w-none">
-                  <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                <div className="prose prose-invert prose-sm max-w-none dark:prose-invert">
+                  <p className="text-slate-200 dark:text-slate-800 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
                 </div>
               </div>
 
               {/* Escalation Warning */}
               {result.escalationRequired && (
-                <div className="mx-5 mb-4 p-3 bg-amber-500/8 border border-amber-500/20 rounded-xl flex items-start gap-3">
+                <div className="escalation-box mx-5 mb-4 p-3 rounded-xl flex items-start gap-3">
                   <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-amber-300 font-medium">Mentor Escalation Recommended</p>
+                    <p className="text-sm text-amber-300 font-medium escalation-msg-text">Mentor Escalation Recommended</p>
                     <p className="text-xs text-amber-400/70 mt-0.5">This topic may require direct mentor clarification. Use #escalate in Yaksha chat.</p>
                   </div>
                 </div>
@@ -272,29 +267,29 @@ export default function AskAI() {
                   <div className="flex flex-wrap gap-2">
                     <span className="text-xs text-slate-500">Sources:</span>
                     {result.sourceSections.map((s, i) => (
-                      <span key={i} className="text-xs font-mono bg-dark-600 text-blue-400 px-2 py-0.5 rounded border border-dark-500">{s}</span>
+                      <span key={i} className="ai-chip text-xs font-mono px-2 py-0.5 rounded border">{s}</span>
                     ))}
                   </div>
                 </div>
               )}
 
               {/* Feedback */}
-              <div className="px-5 pb-5 flex items-center gap-3 border-t border-dark-500/50 pt-4">
-                <span className="text-xs text-slate-500">Was this helpful?</span>
+              <div className="feedback-bar px-5 pb-5 flex items-center gap-3 border-t border-dark-500/50 pt-4">
+                <span className="text-xs text-slate-500 dark:text-slate-600">Was this helpful?</span>
                 {result.sourceDetails?.map(s => (
                   <div key={s.id} className="flex items-center gap-2">
                     <button onClick={() => handleFeedback(s.id, true)}
-                      className={`p-1.5 rounded-lg transition-colors ${feedback[s.id] === 'up' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10'}`}>
+                      className={`p-1.5 rounded-lg transition-colors feedback-btn ${feedback[s.id] === 'up' ? 'bg-emerald-500/20 text-emerald-400' : ''}`}>
                       <ThumbsUp size={13} />
                     </button>
                     <button onClick={() => handleFeedback(s.id, false)}
-                      className={`p-1.5 rounded-lg transition-colors ${feedback[s.id] === 'down' ? 'bg-rose-500/20 text-rose-400' : 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10'}`}>
+                      className={`p-1.5 rounded-lg transition-colors feedback-btn ${feedback[s.id] === 'down' ? 'bg-rose-500/20 text-rose-400' : ''}`}>
                       <ThumbsDown size={13} />
                     </button>
                   </div>
                 ))}
                 <button onClick={() => { setQuestion(result.question); setResult(null) }}
-                  className="ml-auto text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1">
+                  className="ml-auto text-xs text-slate-500 hover:text-slate-300 dark:hover:text-slate-700 flex items-center gap-1 reask-btn px-2 py-1 rounded-lg transition-colors">
                   <RotateCcw size={11} /> Re-ask
                 </button>
               </div>
@@ -303,7 +298,7 @@ export default function AskAI() {
             {/* Source FAQs */}
             {result.sourceDetails?.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-slate-400 dark:text-slate-600 mb-3 flex items-center gap-2">
                   <BookOpen size={14} /> Retrieved FAQ sources ({result.sourceDetails.length})
                 </h3>
                 <div className="space-y-2">
@@ -318,13 +313,13 @@ export default function AskAI() {
             {/* Follow-up suggestions */}
             {result.followUpSuggestions?.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-slate-400 dark:text-slate-600 mb-3 flex items-center gap-2">
                   <Sparkles size={14} /> You might also want to know
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {result.followUpSuggestions.map((q, i) => (
                     <button key={i} onClick={() => { setQuestion(q); handleAsk(q) }}
-                      className="text-sm bg-dark-700 hover:bg-dark-600 border border-dark-500/50 hover:border-blue-500/30 text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                      className="follow-up-btn text-sm px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
                       {q.length > 60 ? q.substring(0, 60) + '...' : q}
                       <ArrowUpRight size={12} className="text-blue-400" />
                     </button>
@@ -339,11 +334,11 @@ export default function AskAI() {
       {/* History */}
       {history.length > 1 && (
         <div>
-          <h3 className="text-sm font-medium text-slate-500 mb-3">Recent searches</h3>
+          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-600 mb-3">Recent searches</h3>
           <div className="flex flex-wrap gap-2">
             {history.slice(1, 6).map((h, i) => (
               <button key={i} onClick={() => { setQuestion(h.question); handleAsk(h.question) }}
-                className="text-xs bg-dark-700 border border-dark-500/50 text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg transition-colors">
+                className="history-btn text-xs px-3 py-1.5 rounded-lg transition-colors">
                 {h.question.length > 40 ? h.question.substring(0, 40) + '...' : h.question}
               </button>
             ))}

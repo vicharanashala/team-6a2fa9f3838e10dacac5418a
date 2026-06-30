@@ -294,7 +294,7 @@ export default function AdminFAQs() {
             <div className="flex flex-wrap gap-1.5">
               {['All', ...CATEGORIES].map(c => (
                 <button key={c} onClick={() => { setCategory(c); setPage(1); }}
-                  className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${category === c ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700 hover:text-slate-300'}`}>
+                  className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${category === c ? 'filter-btn-active' : 'filter-btn'}`}>
                   {c}
                 </button>
               ))}
@@ -305,7 +305,7 @@ export default function AdminFAQs() {
           <span className="text-xs text-slate-500">Importance:</span>
           {['all', ...IMPORTANCES].map(imp => (
             <button key={imp} onClick={() => { setImportance(imp); setPage(1); }}
-              className={`text-xs px-2.5 py-1 rounded-lg border capitalize transition-all ${importance === imp ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'border-dark-500 text-slate-500 bg-dark-700 hover:text-slate-300'}`}>
+              className={`text-xs px-2.5 py-1 rounded-lg border capitalize transition-all ${importance === imp ? 'filter-btn-active' : 'filter-btn'}`}>
               {imp}
             </button>
           ))}

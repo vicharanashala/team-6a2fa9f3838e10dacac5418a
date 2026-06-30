@@ -78,7 +78,7 @@ export default function RaiseQuery() {
           <MessageSquarePlus size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white">Raise a Query</h1>
+          <h1 className="text-xl font-bold dark:text-white discussions-title">Raise a Query</h1>
           <p className="text-sm text-slate-500">AI checks for duplicates and related FAQs before you post</p>
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function RaiseQuery() {
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-emerald-600 text-white' : 'bg-dark-600 text-slate-500'
+              step === s ? 'step-indicator-current' : step > s ? 'step-indicator-done' : 'step-indicator-pending'
             }`}>
               {step > s ? <CheckCircle size={14} /> : s}
             </div>
@@ -144,9 +144,7 @@ export default function RaiseQuery() {
                 {CATEGORIES.map(cat => (
                   <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))}
                     className={`px-3 py-2 rounded-xl text-sm border transition-all ${
-                      form.category === cat
-                        ? 'bg-blue-600/20 border-blue-500/40 text-blue-300'
-                        : 'bg-dark-700 border-dark-500/50 text-slate-400 hover:text-slate-200 hover:border-dark-400'
+                      form.category === cat ? 'category-btn-active' : 'category-btn'
                     }`}>
                     {cat}
                   </button>
@@ -202,11 +200,11 @@ export default function RaiseQuery() {
         {step === 2 && (
           <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
             className="space-y-5">
-            <h2 className="text-lg font-semibold text-white">AI Pre-Check Results</h2>
+            <h2 className="text-lg font-semibold dark:text-white">AI Pre-Check Results</h2>
 
             {/* Duplicate warning */}
             {duplicates?.hasDuplicates && (
-              <div className="card-dark border-amber-500/20 p-5">
+              <div className="card-dark duplicate-card border-amber-500/20 p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle size={16} className="text-amber-400" />
                   <span className="text-sm font-medium text-amber-300">Similar questions found!</span>
@@ -237,7 +235,7 @@ export default function RaiseQuery() {
                 <p className="text-xs text-slate-500 mb-3">These FAQs might answer your question directly:</p>
                 <div className="space-y-2">
                   {duplicates.relatedFAQs.map(faq => (
-                    <div key={faq.id} className="p-3 bg-dark-700 rounded-xl border border-dark-500/50">
+                    <div key={faq.id} className="p-3 bg-dark-700 rounded-xl border border-dark-500/50 related-faq-card">
                       {faq.sectionId && <span className="text-xs font-mono text-blue-400 mr-2">§{faq.sectionId}</span>}
                       <span className="badge-category mb-1.5 inline-block">{faq.category}</span>
                       <p className="text-sm font-medium text-slate-200">{faq.question}</p>
