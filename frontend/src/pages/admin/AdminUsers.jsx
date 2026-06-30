@@ -193,7 +193,7 @@ export default function AdminUsers() {
         className="card-dark p-4">
         <form onSubmit={handleSearch} className="flex gap-3 mb-4">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email..."
               className="input-dark pl-9 text-sm" />
           </div>

@@ -37,21 +37,43 @@ export default function Layout() {
   const [notifOpen, setNotifOpen] = useState(false)
   const [announcements, setAnnouncements] = useState([])
   const [notifLoading, setNotifLoading] = useState(false)
+  const [localReadIds, setLocalReadIds] = useState(new Set())
   const notifRef = useRef(null)
+
+  // Toggle and mark visible notifications as read
+  const handleNotifToggle = () => {
+    setNotifOpen(o => {
+      if (!o) {
+        // Opening: mark all fetched announcements as read locally
+        const allIds = announcements.map(a => a._id)
+        if (allIds.length > 0) {
+          setLocalReadIds(prev => new Set([...prev, ...allIds]))
+        }
+      }
+      return !o
+    })
+  }
+
+  const isAnnRead = (ann) => ann.isRead || localReadIds.has(ann._id)
+
+  // Mark a single announcement as read
+  const onReadAnnouncement = (id) => {
+    setLocalReadIds(prev => new Set([...prev, id]))
+  }
 
   // --- Notification item renderer ---
   const priorityIcon = { urgent: '🔴', important: '🟡', general: '🔵' }
-  function NotifItem({ ann, onClose, navigate }) {
+  function NotifItem({ ann, isRead, onRead, onClose, navigate }) {
     const icon = priorityIcon[ann.priority] || '🔵'
     const preview = ann.content?.length > 80 ? ann.content.slice(0, 80) + '…' : ann.content
     return (
-      <button onClick={() => { onClose(); navigate('/announcements') }}
-        className="w-full flex items-start gap-3 px-4 py-3 hover:bg-dark-600/40 dark:hover:bg-slate-100/60 transition-colors text-left border-b dark:border-dark-500/30 border-slate-200/40 last:border-0">
+      <button onClick={() => { onRead(ann._id); onClose(); navigate('/announcements') }}
+        className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-dark-600/40 dark:hover:bg-slate-100/60 transition-colors text-left border-b dark:border-dark-500/30 border-slate-200/40 last:border-0 ${!isRead ? 'bg-blue-500/[0.03] dark:bg-blue-500/[0.04]' : ''}`}>
         <span className="text-base flex-shrink-0 mt-0.5">{icon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-xs font-semibold dark:text-slate-200 text-slate-900 truncate">{ann.title}</span>
-            {!ann.isRead && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 mt-1" />}
+            {!isAnnRead(ann) && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 mt-1" />}
           </div>
           <p className="text-[11px] text-slate-500 leading-relaxed">{preview}</p>
           <p className="text-[10px] dark:text-slate-600 text-slate-400 mt-1">
@@ -72,18 +94,23 @@ export default function Layout() {
     }
   }, [notifOpen])
 
-  // Close on outside click
+  // Close on outside click + Escape key
   useEffect(() => {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false)
+      if (e.key === 'Escape') setNotifOpen(false)
     }
     document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('keydown', handler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('keydown', handler)
+    }
   }, [])
 
   const pinnedAnnouncements = announcements.filter(a => a.isPinned)
   const latestAnnouncements = announcements.filter(a => !a.isPinned).slice(0, 5)
-  const unreadCount = announcements.filter(a => !a.isRead).length
+  const unreadCount = announcements.filter(a => !isAnnRead(a)).length
   const badgeLabel = unreadCount === 0 ? null : unreadCount > 9 ? '9+' : String(unreadCount)
 
   const SidebarContent = ({ mobile = false }) => (
@@ -199,7 +226,7 @@ export default function Layout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <header className="dark:bg-dark-800/80 bg-white/80 backdrop-blur-md border-b dark:border-dark-500/50 border-slate-200/50 px-4 py-3 flex items-center gap-2 flex-shrink-0">
+        <header className="relative z-40 dark:bg-dark-800/80 bg-white/80 backdrop-blur-md border-b dark:border-dark-500/50 border-slate-200/50 px-4 py-3 flex items-center gap-2 flex-shrink-0 shadow-sm">
 
           {/* Mobile menu toggle */}
           <button onClick={() => setMobileOpen(true)}
@@ -217,7 +244,7 @@ export default function Layout() {
 
           {/* Notification Bell */}
           <div className="relative" ref={notifRef}>
-            <button onClick={() => setNotifOpen(o => !o)} aria-label="Notifications"
+            <button onClick={handleNotifToggle} aria-label="Notifications"
               className="relative p-2 rounded-lg dark:text-slate-400 text-slate-500 dark:hover:text-slate-200 hover:text-slate-900 dark:hover:bg-dark-600 hover:bg-slate-100 transition-colors">
               <motion.div
                 animate={{ rotate: notifOpen ? 15 : 0 }}
@@ -237,11 +264,12 @@ export default function Layout() {
             {/* Notification Dropdown */}
             <AnimatePresence>
               {notifOpen && (
-                <motion.div initial={{ opacity: 0, y: 8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-80 card-dark rounded-2xl shadow-xl border dark:border-dark-500/60 border-slate-200/80 overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b dark:border-dark-500/50 border-slate-200/60 flex items-center justify-between">
+                <motion.div initial={{ opacity: 0, y: 6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                  transition={{ duration: 0.12, ease: 'easeOut' }}
+                  className="absolute right-0 top-full mt-2 w-80 rounded-2xl shadow-2xl border dark:border-dark-500/60 border-slate-200/80 overflow-hidden z-[100]
+                    bg-white dark:bg-dark-800">
+                  <div className="px-4 py-3 border-b dark:border-dark-500/50 border-slate-200/60 flex items-center justify-between flex-shrink-0">
                     <span className="text-sm font-semibold dark:text-white text-slate-900">Notifications</span>
                     {unreadCount > 0 && (
                       <span className="text-[11px] px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-500 font-medium">
@@ -250,7 +278,7 @@ export default function Layout() {
                     )}
                   </div>
 
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="overflow-y-auto" style="max-height: 380px">
                     {notifLoading ? (
                       <div className="p-4 space-y-3">
                         {[0,1,2].map(i => <div key={i} className="skeleton h-12 rounded-lg" />)}
@@ -268,7 +296,7 @@ export default function Layout() {
                               📌 Pinned
                             </div>
                             {pinnedAnnouncements.map(ann => (
-                              <NotifItem key={ann._id} ann={ann} onClose={() => setNotifOpen(false)} navigate={navigate} />
+                              <NotifItem key={ann._id} ann={ann} isRead={isAnnRead(ann)} onRead={onReadAnnouncement} onClose={() => setNotifOpen(false)} navigate={navigate} />
                             ))}
                           </>
                         )}
@@ -278,7 +306,7 @@ export default function Layout() {
                               Latest
                             </div>
                             {latestAnnouncements.map(ann => (
-                              <NotifItem key={ann._id} ann={ann} onClose={() => setNotifOpen(false)} navigate={navigate} />
+                              <NotifItem key={ann._id} ann={ann} isRead={isAnnRead(ann)} onRead={onReadAnnouncement} onClose={() => setNotifOpen(false)} navigate={navigate} />
                             ))}
                           </>
                         )}
@@ -286,7 +314,7 @@ export default function Layout() {
                     )}
                   </div>
 
-                  <div className="px-4 py-3 border-t dark:border-dark-500/50 border-slate-200/60">
+                  <div className="px-4 py-3 border-t dark:border-dark-500/50 border-slate-200/60 flex-shrink-0">
                     <button onClick={() => { setNotifOpen(false); navigate('/announcements') }}
                       className="w-full text-center text-xs font-medium text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors py-1">
                       View All Announcements →

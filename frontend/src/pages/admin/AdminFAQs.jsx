@@ -282,7 +282,7 @@ export default function AdminFAQs() {
         className="card-dark p-4 space-y-3">
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search FAQs..."
               className="input-dark pl-9 text-sm" />
           </div>
