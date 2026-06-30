@@ -9,26 +9,27 @@ const router = express.Router();
 // POST /api/ai/ask - Main RAG query endpoint
 router.post('/ask', optionalAuth, async (req, res) => {
   try {
-    const { question, explainMode = 'intermediate', queryId } = req.body;
+    const { question, explainMode = 'intermediate', queryId, image } = req.body;
     
-    console.log('🔵 AI Ask Request:', { question, explainMode, userId: req.user?._id });
+    console.log('🔵 AI Ask Request:', { question, explainMode, userId: req.user?._id, hasImage: !!image });
     
-    if (!question) {
-      console.warn('⚠️ No question provided');
-      return res.status(400).json({ error: 'Please provide a question.' });
+    if (!question && !image) {
+      console.warn('⚠️ No question or image provided');
+      return res.status(400).json({ error: 'Please provide a question or upload a photo.' });
     }
     
-    const trimmedQuestion = String(question).trim();
-    if (trimmedQuestion.length < 3) {
+    const trimmedQuestion = question ? String(question).trim() : '';
+    if (!image && trimmedQuestion.length < 3) {
       console.warn('⚠️ Question too short:', trimmedQuestion.length);
       return res.status(400).json({ error: 'Question must be at least 3 characters.' });
     }
 
-    console.log('🟢 Processing query:', trimmedQuestion);
+    console.log('🟢 Processing query:', trimmedQuestion || '[Image Only]');
     const result = await processRAGQuery(trimmedQuestion, {
       explainMode,
       userId: req.user?._id,
-      queryId
+      queryId,
+      image
     });
 
     console.log('✅ AI Response generated');

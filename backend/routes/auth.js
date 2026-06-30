@@ -35,8 +35,11 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required.' });
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+    if (!user) {
+      return res.status(401).json({ error: 'User does not exist. Please check your email or sign up.' });
+    }
+    if (!(await user.comparePassword(password))) {
+      return res.status(401).json({ error: 'Incorrect password.' });
     }
     if (!user.isActive) return res.status(401).json({ error: 'Account deactivated. Contact support.' });
     const token = signToken(user._id);
@@ -60,9 +63,13 @@ router.patch('/preferences', protect, async (req, res) => {
     if (theme) update['preferences.theme'] = theme;
     if (explainMode) update['preferences.explainMode'] = explainMode;
     if (typeof notifications !== 'undefined') update['preferences.notifications'] = notifications;
-    const user = await User.findByIdAndUpdate(req.user._id, update, { new: true });
+    const user = await User.findByIdAndUpdate(req.user._id, update, { new: true, runValidators: true });
     res.json({ user });
   } catch (err) {
+    if (err.name === 'ValidationError') {
+      const msg = Object.values(err.errors).map(e => e.message).join(', ');
+      return res.status(400).json({ error: msg });
+    }
     res.status(500).json({ error: 'Failed to update preferences.' });
   }
 });

@@ -14,6 +14,7 @@ const announcementRoutes = require('./routes/announcements');
 const userRoutes = require('./routes/users');
 const adminAnalyticsRoutes = require('./routes/adminAnalytics');
 const adminRoutes = require('./routes/admin');
+const answerQueueRoutes = require('./routes/answerQueue');
 
 const app = express();
 
@@ -30,7 +31,7 @@ app.use(cors({
       'https://web.vxrachit.dpdns.org',
       'https://web.vxrachit.is-a.dev'
     ];
-    
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -65,6 +66,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/answer-queue', answerQueueRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/admin', adminRoutes);
 

@@ -19,6 +19,19 @@ export default function Profile() {
   }, [user]);
 
   const handleSaveProfile = async () => {
+    if (!formData.name?.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    if (/^\d/.test(formData.name)) {
+      toast.error('Name cannot start with a number');
+      return;
+    }
+    if (/^\d+$/.test(formData.name.replace(/\s/g, ''))) {
+      toast.error('Name cannot contain only numbers');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await api.patch('/users/profile', formData);
@@ -60,7 +73,7 @@ export default function Profile() {
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-xl font-bold dark:text-white text-slate-900">{user.name}</h2>
+                <h2 className="text-xl font-bold dark:text-slate-100 text-slate-900">{user.name}</h2>
                 <p className="text-slate-400 text-sm capitalize">{user.role} · {user.phase} phase</p>
                 <span className="badge-category mt-1.5 inline-block">{user.college || 'No college set'}</span>
               </div>

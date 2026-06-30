@@ -305,6 +305,16 @@ export default function QueryDetail() {
         )}
         <p className="text-slate-300 leading-relaxed">{query.content}</p>
 
+        {query.images && query.images.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-4">
+            {query.images.map((img, idx) => (
+              <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="relative group overflow-hidden rounded-xl border border-dark-500 bg-dark-800 hover:border-blue-500/30 transition-all max-w-[240px]" title="View full image">
+                <img src={img} alt={`Screenshot attachment ${idx + 1}`} className="max-h-36 object-contain p-1 group-hover:scale-102 transition-transform" />
+              </a>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mt-5 pt-4 border-t border-dark-500/50">
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-600 discussions-meta">
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white text-[10px] font-bold">

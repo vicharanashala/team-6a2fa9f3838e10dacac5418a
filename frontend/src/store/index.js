@@ -70,7 +70,15 @@ export const useAuthStore = create(
 export const useThemeStore = create(
   persist(
     (set, get) => ({
-      theme: 'dark',
+      theme: 'system',
+      setTheme: (t) => {
+        let actualTheme = t;
+        if (t === 'system') {
+          actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        set({ theme: t });
+        document.body.classList.toggle('light', actualTheme === 'light');
+      },
       toggleTheme: () => {
         const next = get().theme === 'dark' ? 'light' : 'dark';
         set({ theme: next });

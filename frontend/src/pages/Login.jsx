@@ -118,9 +118,20 @@ export function Signup() {
       setLocalError('Please fill in all required fields')
       return
     }
+
+    if (/^\d/.test(form.name)) {
+      setLocalError('Name cannot start with a number')
+      return
+    }
+
+    if (/^\d+$/.test(form.name.replace(/\s/g, ''))) {
+      setLocalError('Name cannot contain only numbers')
+      return
+    }
     
-    if (form.password.length < 6) {
-      setLocalError('Password must be at least 6 characters')
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/
+    if (!passwordRegex.test(form.password)) {
+      setLocalError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character')
       return
     }
     
@@ -169,7 +180,7 @@ export function Signup() {
           <div className="relative">
             <input type={show ? 'text' : 'password'} value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              className="input-dark pr-10" placeholder="Min 6 characters" required minLength={6} />
+              className="input-dark pr-10" placeholder="Min 8 characters (mixed case, numbers, symbols)" required minLength={8} />
             <button type="button" onClick={() => setShow(s => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
               {show ? <EyeOff size={16} /> : <Eye size={16} />}

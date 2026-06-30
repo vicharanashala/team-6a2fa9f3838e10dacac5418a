@@ -4,7 +4,7 @@ import { useAuthStore, useThemeStore, useUIStore } from '../../store'
 import {
   Brain, Home, MessageSquarePlus, MessagesSquare, BarChart3,
   Bell, User, Settings, BookOpen, LogOut, Menu, Sun, Moon,
-  ChevronRight, Zap, Shield, ExternalLink
+  ChevronRight, Zap, Shield, ExternalLink, Image as ImageIcon
 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import api from '../../utils/api'
@@ -235,6 +235,14 @@ export default function Layout() {
           </button>
 
           <div className="flex-1" />
+
+          <button onClick={() => navigate('/announcements')}
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-dark-600 transition-colors relative"
+            title="Announcements">
+            <Bell size={18} />
+            {/* Optional dot indicator for unread announcements */}
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+          </button>
 
           {/* Theme toggle */}
           <button onClick={toggleTheme} aria-label="Toggle theme"

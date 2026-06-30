@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Send, ChevronDown, ChevronUp, Sparkles, BookOpen, ArrowUpRight,
-         ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle, Info, Zap, Copy, RotateCcw } from 'lucide-react'
+import {
+  Brain, Send, ChevronDown, ChevronUp, Sparkles, BookOpen, ArrowUpRight,
+  ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle, Info, Zap, Copy, RotateCcw,
+  Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X
+} from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const EXPLAIN_MODES = [
   { value: 'beginner', label: '🟢 Beginner', desc: 'Simple, step-by-step' },
@@ -77,6 +82,41 @@ function TypingAnimation() {
   )
 }
 
+//  NEW COMPONENT: The hallucination feedback buttons
+const MessageFeedback = ({ message, onFeedback }) => {
+  const [voted, setVoted] = useState(false);
+
+  const handleVote = (isHelpful) => {
+    if (voted) return;
+    setVoted(true);
+    onFeedback(message.question, message.text, isHelpful);
+  };
+
+  if (voted) {
+    return <div className="flex items-center text-xs text-emerald-500 gap-1.5 mt-4 pt-3 border-t border-dark-500/30"><CheckCircle size={14} /> Feedback sent to mentors</div>;
+  }
+
+  return (
+    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-dark-500/30">
+      <span className="text-xs text-slate-500 mr-2">Rate AI Answer:</span>
+      <button
+        onClick={() => handleVote(true)}
+        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+        title="Accurate and helpful"
+      >
+        <ThumbsUp size={14} />
+      </button>
+      <button
+        onClick={() => handleVote(false)}
+        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+        title="Hallucination or inaccurate"
+      >
+        <ThumbsDown size={14} />
+      </button>
+    </div>
+  );
+};
+
 export default function AskAI() {
   const { user } = useAuthStore()
   const [searchParams] = useSearchParams()
@@ -86,8 +126,43 @@ export default function AskAI() {
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState([])
   const [feedback, setFeedback] = useState({})
+  const [isListening, setIsListening] = useState(false)
+  const [isPlayingTTS, setIsPlayingTTS] = useState(false)
+  const [image, setImage] = useState(null)
   const textRef = useRef(null)
   const resultRef = useRef(null)
+  const recognitionRef = useRef(null)
+  const fileInputRef = useRef(null)
+  const startText = useRef('')
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file')
+      return
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error('Image size must be under 4MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImage({
+        data: reader.result.split(',')[1],
+        mimeType: file.type,
+        preview: reader.result
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const clearImage = () => {
+    setImage(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
   useEffect(() => {
     if (searchParams.get('q') && !result) {
@@ -101,22 +176,47 @@ export default function AskAI() {
     }
   }, [result])
 
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
+  }, [])
+
   const handleAsk = async (q = null) => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+      setIsPlayingTTS(false)
+    }
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+    }
+
     const query = (q || question).trim()
-    if (!query || loading) {
-      if (!query) toast.error('Please enter a question')
+    if (!query && !image && !loading) {
+      if (!query && !image) toast.error('Please enter a question or upload a photo')
       return
     }
+    
     if (query.length < 3) {
       toast.error('Question must be at least 3 characters')
       return
     }
+    
     setLoading(true)
     setResult(null)
     try {
+      console.log('📡 Asking AI:', { question: query, explainMode })
       const res = await api.post('/ai/ask', { question: query, explainMode })
+      console.log('✅ AI Response:', res.data)
       setResult({ ...res.data, question: query })
       setHistory(h => [{ question: query, result: res.data }, ...h.slice(0, 9)])
+      clearImage()
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'AI service unavailable. Please try again.'
       toast.error(errorMsg)
@@ -124,13 +224,115 @@ export default function AskAI() {
     setLoading(false)
   }
 
+  const toggleListening = () => {
+    if (!SpeechRecognition) {
+      toast.error('Voice input is not supported in this browser. Try Chrome or Edge.')
+      return
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+    } else {
+      try {
+        const recognition = new SpeechRecognition()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.lang = 'en-US'
+
+        startText.current = question
+
+        recognition.onstart = () => {
+          setIsListening(true)
+          toast.success('Listening... speak now.')
+        }
+
+        recognition.onerror = (e) => {
+          console.error('Speech recognition error:', e.error)
+          if (e.error !== 'no-speech') {
+            toast.error(`Speech recognition error: ${e.error}`)
+            setIsListening(false)
+          }
+        }
+
+        recognition.onend = () => {
+          setIsListening(false)
+        }
+
+        recognition.onresult = (e) => {
+          let speechText = ''
+          for (let i = e.resultIndex; i < e.results.length; ++i) {
+            speechText += e.results[i][0].transcript
+          }
+          const baseText = startText.current.trim()
+          setQuestion(baseText ? `${baseText} ${speechText.trim()}` : speechText.trim())
+        }
+
+        recognitionRef.current = recognition
+        recognition.start()
+      } catch (err) {
+        console.error(err)
+        toast.error('Could not start speech recognition')
+      }
+    }
+  }
+
+  const toggleTTS = () => {
+    if (!window.speechSynthesis) {
+      toast.error('Text-to-speech is not supported in this browser.')
+      return
+    }
+
+    if (isPlayingTTS) {
+      window.speechSynthesis.cancel()
+      setIsPlayingTTS(false)
+    } else {
+      if (!result?.answer) return
+
+      const cleanText = result.answer.replace(/[*#_`~]/g, '')
+      const utterance = new SpeechSynthesisUtterance(cleanText)
+
+      utterance.onend = () => {
+        setIsPlayingTTS(false)
+      }
+
+      utterance.onerror = (e) => {
+        console.error('TTS error:', e)
+        setIsPlayingTTS(false)
+      }
+
+      setIsPlayingTTS(true)
+      window.speechSynthesis.speak(utterance)
+    }
+  }
+
   const handleFeedback = async (faqId, helpful) => {
     try {
       await api.post('/ai/feedback', { faqId, helpful })
       setFeedback(f => ({ ...f, [faqId]: helpful ? 'up' : 'down' }))
       toast.success(helpful ? 'Marked as helpful!' : 'Feedback recorded.')
-    } catch (e) {}
+    } catch (e) { }
   }
+
+  //  NEW FUNCTION: Connects to the backend route we just built
+  const handleAIFeedback = async (questionText, aiAnswerText, isHelpful) => {
+    try {
+      await api.post('/queries/feedback', {
+        question: questionText,
+        aiAnswer: aiAnswerText,
+        isHelpful: isHelpful,
+      });
+
+      if (!isHelpful) {
+        toast.error("Flagged! Sent to the mentor Answer Queue.");
+      } else {
+        toast.success("Thanks! Glad the AI was helpful.");
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast.error("Failed to submit feedback");
+    }
+  };
 
   const copyAnswer = () => {
     navigator.clipboard.writeText(result?.answer || '')
@@ -165,8 +367,8 @@ export default function AskAI() {
               <button key={m.value} onClick={() => setExplainMode(m.value)}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   explainMode === m.value
-                    ? 'explain-btn-active'
-                    : 'explain-btn'
+                    ? 'bg-blue-600/20 border-blue-500/40 text-blue-400'
+                    : 'border-dark-500 text-slate-500 hover:text-slate-300 hover:border-dark-400'
                 }`}>
                 {m.label}
               </button>
@@ -175,10 +377,19 @@ export default function AskAI() {
         </div>
 
         <div className="relative">
+          {image && (
+            <div className="relative inline-block mb-3 rounded-lg overflow-hidden border border-dark-500 bg-dark-700 p-1">
+              <img src={image.preview} alt="Upload preview" className="max-h-24 object-cover rounded" />
+              <button onClick={clearImage} className="absolute top-2 right-2 p-1.5 bg-red-600/90 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg" title="Remove image">
+                <X size={10} />
+              </button>
+            </div>
+          )}
+
           <textarea ref={textRef} value={question}
             onChange={e => setQuestion(e.target.value)} onKeyDown={handleKeyDown}
             placeholder="Ask about NOC, ViBe issues, Rosetta, team formation, offer letter... (Ctrl+Enter to send)"
-            className="input-dark min-h-[120px] resize-none pr-14 text-base" style={{ boxShadow: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)' }} rows={3} />
+            className="input-dark min-h-[100px] resize-none pr-14 text-base" rows={3} />
           <button onClick={() => handleAsk()} disabled={loading || !question.trim()}
             className="absolute bottom-3 right-3 w-9 h-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all hover:shadow-lg hover:shadow-blue-500/25">
             <Send size={16} className="text-white" />
@@ -210,7 +421,7 @@ export default function AskAI() {
           <motion.div ref={resultRef} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             className="space-y-4">
             {/* Answer Card */}
-            <div className="card-dark answer-border border-blue-500/15">
+            <div className="card-dark border-blue-500/15">
               {/* Header */}
               <div className="flex items-start justify-between p-5 pb-0">
                 <div className="flex items-center gap-2.5">
@@ -224,7 +435,7 @@ export default function AskAI() {
                 </div>
                 <div className="flex items-center gap-2">
                   <ConfidenceBadge level={result.confidence} score={result.confidenceScore} />
-                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 dark:hover:text-slate-700 hover:bg-dark-600 dark:hover:bg-slate-200 transition-colors copy-btn">
+                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-dark-600 transition-colors">
                     <Copy size={14} />
                   </button>
                 </div>
@@ -245,8 +456,8 @@ export default function AskAI() {
 
               {/* Answer */}
               <div className="p-5">
-                <div className="prose prose-invert prose-sm max-w-none dark:prose-invert">
-                  <p className="dark:text-slate-200 text-slate-700 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                <div className="prose prose-invert prose-sm max-w-none">
+                  <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
                 </div>
               </div>
 

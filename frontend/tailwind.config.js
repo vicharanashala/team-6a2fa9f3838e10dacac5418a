@@ -11,13 +11,25 @@ export default {
       },
       colors: {
         dark: {
-          900: '#070B14',
-          800: '#0D1117',
-          750: '#111827',
-          700: '#161D2F',
-          600: '#1E2A3B',
-          500: '#253347',
-          400: '#2E3F57',
+          900: 'rgb(var(--dark-900) / <alpha-value>)',
+          800: 'rgb(var(--dark-800) / <alpha-value>)',
+          750: 'rgb(var(--dark-750) / <alpha-value>)',
+          700: 'rgb(var(--dark-700) / <alpha-value>)',
+          600: 'rgb(var(--dark-600) / <alpha-value>)',
+          500: 'rgb(var(--dark-500) / <alpha-value>)',
+          400: 'rgb(var(--dark-400) / <alpha-value>)',
+        },
+        slate: {
+          50: 'rgb(var(--slate-50) / <alpha-value>)',
+          100: 'rgb(var(--slate-100) / <alpha-value>)',
+          200: 'rgb(var(--slate-200) / <alpha-value>)',
+          300: 'rgb(var(--slate-300) / <alpha-value>)',
+          400: 'rgb(var(--slate-400) / <alpha-value>)',
+          500: 'rgb(var(--slate-500) / <alpha-value>)',
+          600: 'rgb(var(--slate-600) / <alpha-value>)',
+          700: 'rgb(var(--slate-700) / <alpha-value>)',
+          800: 'rgb(var(--slate-800) / <alpha-value>)',
+          900: 'rgb(var(--slate-900) / <alpha-value>)',
         },
         accent: {
           blue: '#3B82F6',
@@ -49,5 +61,7 @@ export default {
       backdropBlur: { xs: '2px' }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

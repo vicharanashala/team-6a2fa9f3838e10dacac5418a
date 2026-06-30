@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquarePlus, Wand2, Search, AlertCircle, CheckCircle, ArrowRight, X, Loader } from 'lucide-react'
+import { MessageSquarePlus, Wand2, Search, AlertCircle, CheckCircle, ArrowRight, X, Loader, UploadCloud, Image as ImageIcon } from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
@@ -12,7 +12,15 @@ const TAG_SUGGESTIONS = ['urgent', 'bug', 'vibe-issue', 'noc-help', 'offer-lette
 export default function RaiseQuery() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ title: '', content: '', category: '', tags: [] })
+  const location = useLocation()
+  const [form, setForm] = useState({
+    title: location.state?.title || '',
+    content: location.state?.content || '',
+    category: location.state?.category || '',
+    tags: []
+  })
+  const [images, setImages] = useState(location.state?.images || [])
+  const fileInputRef = useRef(null)
   const [refined, setRefined] = useState(null)
   const [duplicates, setDuplicates] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -20,6 +28,29 @@ export default function RaiseQuery() {
   const [checking, setChecking] = useState(false)
   const [step, setStep] = useState(1) // 1=form, 2=review, 3=done
   const [newTag, setNewTag] = useState('')
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file')
+      return
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error('Image size must be under 4MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImages([reader.result])
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const clearImage = () => {
+    setImages([])
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const handleRefine = async () => {
     if (!form.title.trim()) return
@@ -54,7 +85,7 @@ export default function RaiseQuery() {
     }
     setSubmitting(true)
     try {
-      const data = { ...form, refinedTitle: refined || form.title }
+      const data = { ...form, refinedTitle: refined || form.title, images }
       const res = await api.post('/queries', data)
       toast.success('Query posted! AI is generating an answer...')
       navigate(`/discussions/${res.data._id}`)
@@ -159,6 +190,28 @@ export default function RaiseQuery() {
                 className="input-dark resize-none" rows={5}
                 placeholder="Provide full context. What did you try? What error or confusion are you facing? The more specific, the better the AI answer will be." />
               <p className="text-xs text-slate-500 mt-1.5">{form.content.length} characters · Be specific for better AI matching</p>
+            </div>
+
+            {/* Screenshots */}
+            <div className="card-dark p-5">
+              <label className="text-sm font-medium text-slate-300 mb-2 block">Attached Screenshots (Optional)</label>
+              <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+              {images.length === 0 ? (
+                <div onClick={() => fileInputRef.current?.click()}
+                  className="border border-dashed border-dark-500 hover:border-violet-500/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-dark-700/30">
+                  <UploadCloud size={24} className="text-slate-500 mb-2" />
+                  <span className="text-xs text-slate-400">Click to upload error screenshots</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="relative rounded-xl overflow-hidden border border-dark-500 max-w-xs bg-dark-800">
+                    <img src={images[0]} alt="Screenshot preview" className="max-h-40 object-contain p-1 mx-auto" />
+                    <button onClick={clearImage} className="absolute top-2 right-2 p-1.5 bg-red-600/90 text-white rounded-lg hover:bg-red-700 transition-colors shadow">
+                      <X size={10} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Tags */}

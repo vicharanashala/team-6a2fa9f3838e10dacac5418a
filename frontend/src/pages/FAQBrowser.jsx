@@ -7,14 +7,67 @@ import api from '../utils/api'
 
 const CATEGORIES = ['All', 'NOC', 'Offer Letter', 'ViBe', 'Rosetta', 'Team Formation', 'Coursework', 'Mentor Support', 'AI/Yaksha', 'Certificate', 'Timing', 'About', 'General']
 
-function FAQItem({ faq }) {
+function Highlight({ text, term }) {
+  if (!term || !term.trim()) return <>{text}</>
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+  const parts = text.split(regex)
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part)
+          ? <mark key={i} className="bg-amber-400/30 text-amber-200 rounded px-0.5">{part}</mark>
+          : part
+      )}
+    </>
+  )
+}
+
+function getSummary(answer) {
+  const first = answer.split(/[.\n]/)[0].trim()
+  return first.length > 120 ? first.slice(0, 117) + '…' : first + (answer.length > first.length ? '…' : '')
+}
+
+function FAQItem({ faq, searchTerm }) {
   const [open, setOpen] = useState(false)
   const importanceColor = { critical: 'rose', high: 'amber', medium: 'blue', low: 'slate' }
   const c = importanceColor[faq.importance] || 'slate'
+  const summary = getSummary(faq.answer)
+
+  const readTime = Math.max(
+  1,
+  Math.ceil(faq.answer.trim().split(/\s+/).length / 200)
+)
 
   return (
     <div className="card-dark overflow-hidden">
-      <button onClick={() => setOpen(o => !o)}
+      <button
+  onClick={() => {
+    setOpen(o => !o)
+
+    let recent = JSON.parse(
+      localStorage.getItem('recentFAQs') || '[]'
+    )
+
+    recent = recent.filter(
+      item => item._id !== faq._id
+    )
+
+    recent.unshift({
+      _id: faq._id,
+      question: faq.question
+    })
+
+    recent = recent.slice(0, 5)
+
+    localStorage.setItem(
+      'recentFAQs',
+      JSON.stringify(recent)
+    )
+
+    window.dispatchEvent(
+      new Event('recentFAQUpdated')
+    )
+  }}
         className="w-full flex items-start gap-4 p-4 text-left hover:bg-dark-600/40 transition-colors">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -27,7 +80,17 @@ function FAQItem({ faq }) {
               'bg-slate-500/10 text-slate-400 dark:text-slate-400 text-slate-600 border-slate-500/20'
             }`}>{faq.importance}</span>
           </div>
-          <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{faq.question}</p>
+                     <p className="text-xs text-slate-500 mb-1">
+  ⏱️ {readTime} min read
+</p>
+          <p className="text-sm font-medium dark:text-slate-200 text-slate-700">
+            <Highlight text={faq.question} term={searchTerm} />
+          </p>
+          {!open && (
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              <Highlight text={summary} term={searchTerm} />
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-xs text-slate-500">{faq.usageCount} uses</span>
@@ -37,7 +100,9 @@ function FAQItem({ faq }) {
       {open && (
         <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }}
           className="border-t border-dark-500/50 px-4 py-4">
-          <p className="text-sm dark:text-slate-300 text-slate-700 leading-relaxed whitespace-pre-wrap">{faq.answer}</p>
+          <p className="text-sm dark:text-slate-300 text-slate-700 leading-relaxed whitespace-pre-wrap">
+            <Highlight text={faq.answer} term={searchTerm} />
+          </p>
           {faq.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               {faq.tags.map(t => <span key={t} className="text-xs text-slate-500 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
@@ -54,25 +119,52 @@ export function FAQBrowser() {
   const [faqs, setFaqs] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
   const [category, setCategory] = useState(searchParams.get('category') || 'All')
   const [total, setTotal] = useState(0)
+  const [recentFAQs, setRecentFAQs] = useState([])
+  
 
-  useEffect(() => { fetchFAQs() }, [category])
+  useEffect(() => {
+  fetchFAQs(search)
 
-  const fetchFAQs = async () => {
+  const loadRecent = () => {
+    const recent = JSON.parse(
+      localStorage.getItem('recentFAQs') || '[]'
+    )
+    setRecentFAQs(recent)
+  }
+
+  loadRecent()
+
+  window.addEventListener(
+    'recentFAQUpdated',
+    loadRecent
+  )
+
+  return () => {
+    window.removeEventListener(
+      'recentFAQUpdated',
+      loadRecent
+    )
+  }
+}, [category])
+
+  const fetchFAQs = async (term) => {
     setLoading(true)
     try {
       const params = { limit: 100 }
       if (category !== 'All') params.category = category
-      if (search) params.search = search
+      if (term) params.search = term
       const res = await api.get('/faq', { params })
       setFaqs(res.data.faqs)
       setTotal(res.data.total)
+      setActiveSearch(term || '')
     } catch (e) { console.error(e) }
     setLoading(false)
   }
 
-  const handleSearch = (e) => { e.preventDefault(); fetchFAQs() }
+  const handleSearch = (e) => { e.preventDefault(); fetchFAQs(search) }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -101,13 +193,31 @@ export function FAQBrowser() {
             }`}>{c}</button>
         ))}
       </div>
+       {recentFAQs.length > 0 && (
+        <div className="card-dark p-4 mb-6">
+          <h3 className="text-white font-semibold mb-3">
+            Recently Viewed FAQs
+          </h3>
+
+          <div className="space-y-2">
+            {recentFAQs.map(item => (
+              <div
+                key={item._id}
+                className="text-sm text-slate-300 bg-dark-700 p-2 rounded"
+              >
+                {item.question}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         {loading
           ? Array(8).fill(0).map((_, i) => <div key={i} className="card-dark h-14 animate-pulse" />)
           : faqs.length === 0
             ? <div className="text-center py-16 text-slate-500 dark:text-slate-500 text-slate-500">No FAQs found</div>
-            : faqs.map(faq => <FAQItem key={faq._id} faq={faq} />)
+            : faqs.map(faq => <FAQItem key={faq._id} faq={faq} searchTerm={activeSearch} />)
         }
       </div>
     </div>

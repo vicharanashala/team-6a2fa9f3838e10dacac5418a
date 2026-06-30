@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Brain, TrendingUp, Flame, Search, ArrowRight, Sparkles, AlertCircle,
-         BookOpen, Users, Shield, Zap, ChevronRight, MessageSquarePlus } from 'lucide-react'
+         BookOpen, Users, Shield, Zap, ChevronRight, MessageSquarePlus, Image as ImageIcon } from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
 
@@ -104,6 +104,10 @@ export default function Home() {
           <button onClick={() => navigate('/ask')}
             className="flex items-center gap-2 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/20 text-blue-400 rounded-xl px-4 py-2 text-sm transition-all">
             <Brain size={15} /> Ask AI
+          </button>
+          <button onClick={() => navigate('/upload-photos')}
+            className="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-500 text-slate-300 rounded-xl px-4 py-2 text-sm transition-all">
+            <ImageIcon size={15} /> Ask with Photo
           </button>
           <button onClick={() => navigate('/raise-query')}
             className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all quick-action-btn-home">

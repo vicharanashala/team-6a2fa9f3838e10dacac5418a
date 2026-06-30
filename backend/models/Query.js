@@ -31,6 +31,12 @@ const querySchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   status: { type: String, enum: ['open', 'answered', 'resolved', 'escalated'], default: 'open' },
   priority: { type: String, enum: ['urgent', 'high', 'normal', 'low'], default: 'normal' },
+  // ── Answer Queue lock (CSFAQ-style pull-and-answer flow) ──────────────
+  lockedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  lockedAt: { type: Date, default: null },
+  lockExpiresAt: { type: Date, default: null },
+  skipCount: { type: Number, default: 0 },
+  isStalled: { type: Boolean, default: false },
   answers: [answerSchema],
   aiAnswer: {
     content: String,
@@ -53,6 +59,7 @@ const querySchema = new mongoose.Schema({
   assignedMentor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   // Refined question from AI
   refinedTitle: String,
+  images: [String],
   searchVector: { type: Map, of: Number },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

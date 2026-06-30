@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore, useThemeStore } from '../store';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
@@ -8,11 +9,50 @@ export default function Settings() {
   const { user, updatePreferences, updateUser } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   const [preferences, setPreferences] = useState({
     theme: 'system',
     explainMode: 'intermediate',
     notifications: true
   });
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword) return toast.error('Please fill in both fields');
+    setIsLoading(true);
+    try {
+      await api.patch('/users/change-password', { currentPassword, newPassword });
+      toast.success('Password changed successfully');
+      setCurrentPassword('');
+      setNewPassword('');
+      setIsChangingPassword(false);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to change password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm('Are you sure you want to withdraw from the internship and permanently delete your account? This action cannot be undone.')) {
+      setIsLoading(true);
+      try {
+        await api.delete('/users/withdraw');
+        toast.success('Account permanently deleted');
+        logout();
+        navigate('/login');
+      } catch (err) {
+        toast.error('Failed to delete account');
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   useEffect(() => {
     if (user?.preferences) {

@@ -8,7 +8,21 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Name is required'],
     trim: true,
     minlength: 2,
-    maxlength: 50
+    maxlength: 50,
+    validate: [
+      {
+        validator: function(val) {
+          return !/^\d/.test(val);
+        },
+        message: 'Name cannot start with a number'
+      },
+      {
+        validator: function(val) {
+          return !/^\d+$/.test(val.replace(/\s/g, ''));
+        },
+        message: 'Name cannot contain only numbers'
+      }
+    ]
   },
   email: {
     type: String,
@@ -20,7 +34,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: 6,
     select: false
   },
   role: {

@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useAuthStore } from './store'
+import { useAuthStore, useThemeStore } from './store'
 import Layout from './components/layout/Layout'
 import AdminLayout from './components/admin/AdminLayout'
 import Landing from './pages/Landing'
@@ -21,6 +21,7 @@ import AdminUsers from './pages/admin/AdminUsers'
 import AdminAnnouncements from './pages/admin/AdminAnnouncements'
 import AdminFAQs from './pages/admin/AdminFAQs'
 import AdminEscalations from './pages/admin/AdminEscalations'
+import UploadPhotos from './pages/UploadPhotos'
 
 function ProtectedRoute({ children }) {
   const token = useAuthStore(state => state.token)
@@ -48,6 +49,15 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
+  const user = useAuthStore(state => state.user)
+  const setTheme = useThemeStore(state => state.setTheme)
+
+  useEffect(() => {
+    if (user?.preferences?.theme) {
+      setTheme(user.preferences.theme)
+    }
+  }, [user?.preferences?.theme, setTheme])
+
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -77,6 +87,7 @@ export default function App() {
       >
         <Route path="home" element={<Home />} />
         <Route path="ask" element={<AskAI />} />
+        <Route path="upload-photos" element={<UploadPhotos />} />
         <Route path="raise-query" element={<RaiseQuery />} />
         <Route path="discussions" element={<Discussions />} />
         <Route path="discussions/:id" element={<QueryDetail />} />
