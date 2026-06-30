@@ -51,7 +51,7 @@ function SourceCard({ section, category, question, similarity }) {
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
             className="overflow-hidden source-hdr border-t border-dark-500/50">
             <div className="px-4 py-3 source-card-body">
-              <p className="text-sm font-medium text-slate-300 dark:text-slate-800 mb-1">{question}</p>
+              <p className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-1">{question}</p>
               <span className="badge-category">{category}</span>
             </div>
           </motion.div>
@@ -151,7 +151,7 @@ export default function AskAI() {
           <Brain size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white dark:text-slate-900">Ask AI</h1>
+          <h1 className="text-xl font-bold dark:text-white text-slate-900">Ask AI</h1>
           <p className="text-sm text-slate-500">RAG-powered · Grounded in internship FAQ · Zero hallucinations</p>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function AskAI() {
                     <Zap size={14} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-white dark:text-slate-900">VINS AI</div>
+                    <div className="text-sm font-medium dark:text-white text-slate-900">VINS AI</div>
                     <div className="text-xs text-slate-500">Grounded in FAQ knowledge base</div>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function AskAI() {
               {/* Answer */}
               <div className="p-5">
                 <div className="prose prose-invert prose-sm max-w-none dark:prose-invert">
-                  <p className="text-slate-200 dark:text-slate-800 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                  <p className="dark:text-slate-200 text-slate-700 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
                 </div>
               </div>
 

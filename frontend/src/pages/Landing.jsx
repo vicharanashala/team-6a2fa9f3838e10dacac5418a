@@ -32,7 +32,7 @@ export default function Landing() {
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
             <Zap size={16} className="text-white" />
           </div>
-          <span className="font-bold text-white text-lg">VINS</span>
+          <span className="font-bold dark:text-white text-slate-900 text-lg">VINS</span>
           <span className="text-xs text-slate-500 font-mono">AI Intelligence</span>
         </div>
         <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export default function Landing() {
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${cfg.bg}`}>
                     <f.icon size={20} className={cfg.text} />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3>
+                  <h3 className="text-lg font-semibold dark:text-white text-slate-900 mb-2">{f.title}</h3>
                   <p className="text-slate-400 dark:text-slate-600 text-sm leading-relaxed">{f.desc}</p>
                 </motion.div>
               )
