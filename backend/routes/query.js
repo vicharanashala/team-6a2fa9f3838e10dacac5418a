@@ -1,5 +1,6 @@
 const express = require('express');
 const Query = require('../models/Query');
+const User = require('../models/User');
 const FAQ = require('../models/FAQ');
 const { protect, optionalAuth, restrictTo } = require('../middleware/auth');
 const { processRAGQuery } = require('../utils/ragService');
@@ -285,6 +286,114 @@ router.post('/feedback', async (req, res) => {
   } catch (error) {
     console.error("Feedback error:", error);
     return res.status(500).json({ error: "Failed to process feedback." });
+  }
+});
+
+// ─── Admin Routes ─────────────────────────────────────────────────────────────
+
+// GET /api/queries/admin/all - List ALL queries including answered/closed (admin only)
+router.get('/admin/all', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const { category, status, search, page = 1, limit = 20 } = req.query;
+    const filter = {};
+    if (category && category !== 'All') filter.category = category;
+    if (status && status !== 'All') filter.status = status;
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } }
+      ];
+    }
+    const total = await Query.countDocuments(filter);
+    const queries = await Query.find(filter)
+      .populate('author', 'name role avatar')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+    res.json({ queries, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch queries.' });
+  }
+});
+
+// GET /api/queries/admin/escalated - List only escalated queries (admin only)
+router.get('/admin/escalated', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const filter = { isEscalated: true };
+    const total = await Query.countDocuments(filter);
+    const queries = await Query.find(filter)
+      .populate('author', 'name role avatar college')
+      .populate('assignedMentor', 'name email')
+      .sort({ escalatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+    res.json({ queries, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch escalated queries.' });
+  }
+});
+
+// PATCH /api/queries/admin/escalated/:id/resolve - Mark escalated query as resolved (admin only)
+router.patch('/admin/escalated/:id/resolve', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const query = await Query.findByIdAndUpdate(req.params.id, {
+      isEscalated: false,
+      status: 'answered',
+      resolvedAt: new Date()
+    }, { new: true }).populate('author', 'name role avatar').lean();
+    if (!query) return res.status(404).json({ error: 'Query not found.' });
+    res.json({ message: 'Escalated query resolved.', query });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// PATCH /api/queries/admin/escalated/:id/assign - Assign mentor to escalated query (admin only)
+router.patch('/admin/escalated/:id/assign', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const { mentorId } = req.body;
+    if (!mentorId) return res.status(400).json({ error: 'mentorId is required.' });
+    const mentor = await User.findById(mentorId);
+    if (!mentor) return res.status(404).json({ error: 'Mentor not found.' });
+    if (mentor.role !== 'mentor' && mentor.role !== 'admin') {
+      return res.status(400).json({ error: 'Specified user is not a mentor.' });
+    }
+    const query = await Query.findByIdAndUpdate(req.params.id, {
+      assignedMentor: mentorId,
+      isEscalated: false,
+      status: 'open'
+    }, { new: true }).populate('author', 'name role avatar').populate('assignedMentor', 'name email').lean();
+    if (!query) return res.status(404).json({ error: 'Query not found.' });
+    res.json({ message: 'Mentor assigned.', query });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/queries/admin/escalation-stats - Get escalation statistics (admin only)
+router.get('/admin/escalation-stats', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const [totalEscalated, resolved, unassigned] = await Promise.all([
+      Query.countDocuments({ isEscalated: true }),
+      Query.countDocuments({ isEscalated: true, status: 'answered' }),
+      Query.countDocuments({ isEscalated: true, assignedMentor: { $exists: false } })
+    ]);
+    const recentEscalations = await Query.find({ isEscalated: true })
+      .populate('author', 'name avatar')
+      .sort({ escalatedAt: -1 })
+      .limit(10)
+      .lean();
+    res.json({
+      total: totalEscalated,
+      resolved,
+      unassigned,
+      recentEscalations
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch escalation stats.' });
   }
 });
 

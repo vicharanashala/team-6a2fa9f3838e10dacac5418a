@@ -1,0 +1,39 @@
+/* =========================================================
+   theme.css — CSS variables + base reset + light/dark tokens
+   ========================================================= */
+
+/* ---------- Dark theme (default) ---------- */
+:root {
+  --bg-base:       #0D1117;
+  --bg-card:       #1a2233;
+  --bg-input:      #1a2233;
+  --bg-hover:      #253347;
+  --border-base:   #2d3748;
+  --text-primary:  #e2e8f0;
+  --text-secondary:#94a3b8;
+  --text-muted:    #64748b;
+  --accent-blue:   #3B82F6;
+  --accent-emerald:#10B981;
+  --accent-amber:  #F59E0B;
+  --accent-rose:   #F43F5E;
+  --accent-violet: #8B5CF6;
+  --accent-cyan:   #06B6D4;
+  --accent-orange: #F97316;
+  --scrollbar-bg:  #0D1117;
+  --scrollbar-thumb: #253347;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+/* ---------- Text selection ---------- */
+::selection { background: rgba(59,130,246,0.3); color: white; }
+
+/* ---------- Focus ring ---------- */
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}

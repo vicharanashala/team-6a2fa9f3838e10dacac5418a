@@ -12,7 +12,7 @@ const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#F43F5E', '#06B6D4'
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-dark-700 border border-dark-400 rounded-xl px-3 py-2.5 text-xs">
+      <div className="bg-dark-700 border border-dark-400 dark:bg-dark-700 rounded-xl px-3 py-2.5 text-xs bg-slate-100 border-slate-200">
         <p className="text-slate-400 mb-1">{label}</p>
         {payload.map((p, i) => (
           <p key={i} style={{ color: p.color }} className="font-medium">{p.name}: {p.value}</p>
@@ -24,17 +24,24 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 function StatCard({ icon: Icon, label, value, sub, color = 'blue', delay = 0 }) {
+  const colorMap = {
+    blue:    { bg: 'bg-blue-500/15 border-blue-500/20',    text: 'text-blue-400'    },
+    amber:   { bg: 'bg-amber-500/15 border-amber-500/20',  text: 'text-amber-400'   },
+    emerald: { bg: 'bg-emerald-500/15 border-emerald-500/20', text: 'text-emerald-400' },
+    violet:  { bg: 'bg-violet-500/15 border-violet-500/20', text: 'text-violet-400'  },
+  }
+  const c = colorMap[color] || colorMap.blue
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
       className="card-dark p-5">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-slate-500 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-white">{value}</p>
-          {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
+          <p className="text-3xl font-bold dark:text-white text-slate-900">{value}</p>
+          {sub && <p className="text-xs dark:text-slate-500 text-slate-600 mt-1">{sub}</p>}
         </div>
-        <div className={`w-10 h-10 rounded-xl bg-${color}-500/15 border border-${color}-500/20 flex items-center justify-center`}>
-          <Icon size={20} className={`text-${color}-400`} />
+        <div className={`w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center`}>
+          <Icon size={20} className={c.text} />
         </div>
       </div>
     </motion.div>
@@ -97,7 +104,7 @@ export default function Analytics() {
           <BarChart3 size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white">Confusion Analytics</h1>
+          <h1 className="text-xl font-bold dark:text-white text-slate-900">Confusion Analytics</h1>
           <p className="text-sm text-slate-500">Real-time insight into what's confusing 500+ interns</p>
         </div>
       </div>
@@ -114,7 +121,7 @@ export default function Analytics() {
         {/* Category Breakdown */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="card-dark p-5">
-          <h3 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-900 mb-5 flex items-center gap-2">
             <TrendingUp size={14} className="text-blue-400" /> Confusion by Category
           </h3>
           {categoryData.length > 0 ? (
@@ -136,7 +143,7 @@ export default function Analytics() {
         {/* AI Confidence Distribution */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
           className="card-dark p-5">
-          <h3 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-900 mb-5 flex items-center gap-2">
             <Brain size={14} className="text-violet-400" /> AI Confidence Distribution
           </h3>
           {confidence.length > 0 ? (
@@ -169,7 +176,7 @@ export default function Analytics() {
         {/* Daily Activity */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
           className="card-dark p-5 md:col-span-2">
-          <h3 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-900 mb-5 flex items-center gap-2">
             <Zap size={14} className="text-amber-400" /> Daily Activity (Last 14 Days)
           </h3>
           {dailyActivity.length > 0 ? (
@@ -204,7 +211,7 @@ export default function Analytics() {
       {trending.trending.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           className="card-dark p-5">
-          <h3 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-900 mb-5 flex items-center gap-2">
             <TrendingUp size={14} className="text-rose-400" /> 🔥 Trending Confusions (Last 7 Days)
           </h3>
           <div className="space-y-3">
@@ -213,10 +220,10 @@ export default function Analytics() {
                 <span className="text-lg font-bold font-mono text-slate-700 w-6">#{i + 1}</span>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-slate-300">{t._id}</span>
+                    <span className="text-sm dark:text-slate-300 text-slate-700">{t._id}</span>
                     <span className="text-xs text-slate-500">{t.count} queries</span>
                   </div>
-                  <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+                  <div className="h-2 dark:bg-dark-600 bg-slate-200 rounded-full overflow-hidden">
                     <motion.div initial={{ width: 0 }} animate={{ width: `${(t.count / (trending.trending[0]?.count || 1)) * 100}%` }}
                       transition={{ delay: 0.6 + i * 0.1 }}
                       className="h-full rounded-full"
@@ -233,15 +240,15 @@ export default function Analytics() {
       {gaps.unanswered?.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
           className="card-dark p-5 border-amber-500/10">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
             <AlertTriangle size={14} className="text-amber-400" /> FAQ Gaps — Unanswered Queries
           </h3>
           <p className="text-xs text-slate-500 mb-4">These questions have no answers yet. Consider adding FAQ entries for these topics.</p>
           <div className="space-y-2">
             {gaps.unanswered.map((q, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-dark-700 rounded-xl border border-dark-500/50">
+              <div key={i} className="flex items-center gap-3 p-3 dark:bg-dark-700 bg-white rounded-xl dark:border-dark-500/50 border-slate-200/80">
                 <span className="badge-category">{q.category}</span>
-                <span className="text-sm text-slate-300 flex-1 truncate">{q.title}</span>
+                <span className="text-sm dark:text-slate-300 text-slate-700 flex-1 truncate">{q.title}</span>
                 <span className="text-xs text-slate-600 flex items-center gap-1 flex-shrink-0">
                   <Users size={11} /> {q.views} views
                 </span>

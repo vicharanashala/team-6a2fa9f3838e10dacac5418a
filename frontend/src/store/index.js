@@ -80,40 +80,14 @@ export const useThemeStore = create(
         document.body.classList.toggle('light', actualTheme === 'light');
       },
       toggleTheme: () => {
-        const current = get().theme;
-        let next;
-        if (current === 'system') {
-          const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          next = isSystemDark ? 'light' : 'dark';
-        } else {
-          next = current === 'dark' ? 'light' : 'dark';
-        }
-        
-        get().setTheme(next);
-        
-        // Sync with backend if user is logged in
-        const { user, updatePreferences } = useAuthStore.getState();
-        if (user) {
-          updatePreferences({ ...user.preferences, theme: next });
-        }
+        const next = get().theme === 'dark' ? 'light' : 'dark';
+        set({ theme: next });
+        // Toggle .dark class for Tailwind dark: variant support
+        document.body.classList.toggle('dark', next === 'dark');
       },
       initTheme: () => {
-        const { theme, setTheme } = get();
-        setTheme(theme);
-        
-        // Listen to system theme changes
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handler = () => {
-          if (get().theme === 'system') {
-            setTheme('system');
-          }
-        };
-        
-        if (mediaQuery.addEventListener) {
-          mediaQuery.addEventListener('change', handler);
-        } else {
-          mediaQuery.addListener(handler);
-        }
+        const { theme } = get();
+        document.body.classList.toggle('dark', theme === 'dark');
       }
     }),
     { name: 'vins-theme' }

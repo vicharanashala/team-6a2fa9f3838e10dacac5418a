@@ -1,0 +1,214 @@
+/* =========================================================
+   utilities.css — Page-specific component overrides & light-mode tokens
+   No duplicate definitions here — each class appears exactly once.
+   ========================================================= */
+
+/* ============================================================
+   LIGHT MODE — bg-dark / text-dark / border-dark equivalents
+   ============================================================ */
+
+body:not(.dark) .bg-dark-700 { background-color: #f1f5f9; }
+body:not(.dark) .bg-dark-600 { background-color: #e2e8f0; }
+body:not(.dark) .bg-dark-500 { background-color: #cbd5e1; }
+body:not(.dark) .text-dark-300 { color: #334155; }
+body:not(.dark) .text-dark-400 { color: #475569; }
+body:not(.dark) .text-dark-500 { color: #64748b; }
+body:not(.dark) .border-dark-500 { border-color: #94a3b8; }
+body:not(.dark) .border-dark-600\/50 { border-color: #cbd5e1 !important; }
+body:not(.dark) .hover\:border-dark-400:hover { border-color: #94a3b8 !important; }
+
+/* Make arbitrary border-dark-500 variants visible in light mode */
+body:not(.dark) [class*="border-dark-500"] { border-color: #cbd5e1 !important; }
+
+/* ============================================================
+   LIGHT MODE — hover overrides for hardcoded dark hovers
+   ============================================================ */
+
+body:not(.dark) .hover\:bg-dark-600:hover { background-color: #f1f5f9; }
+body:not(.dark) .hover\:bg-dark-700\/50:hover { background-color: #f8fafc; }
+
+/* ============================================================
+   ASK AI PAGE
+   ============================================================ */
+
+body:not(.dark) .source-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .source-card-body { background: #f1f5f9; border-color: #e2e8f0; }
+body:not(.dark) .typing-msg { background: #f1f5f9; }
+body:not(.dark) .explain-btn {
+  border-color: #cbd5e1; color: #64748b;
+}
+body:not(.dark) .explain-btn:hover {
+  border-color: #94a3b8; color: #334155; background: #f1f5f9;
+}
+body:not(.dark) .explain-btn-active {
+  background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.4); color: #3b82f6;
+}
+body:not(.dark) .related-tag { background: #e2e8f0; border-color: #cbd5e1; color: #475569; }
+body:not(.dark) .follow-up-btn { background: #f8fafc; border-color: #e2e8f0; color: #334155; }
+body:not(.dark) .follow-up-btn:hover {
+  background: #f1f5f9; border-color: rgba(59,130,246,0.3); color: #1e40af;
+}
+body:not(.dark) .ai-chip { background: #e2e8f0; border-color: #cbd5e1; color: #3b82f6; }
+body:not(.dark) .history-btn { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+body:not(.dark) .history-btn:hover { color: #1e293b; }
+body:not(.dark) .step-badge { background: #f1f5f9; color: #64748b; }
+body:not(.dark) .askai-topbar { border-color: #e2e8f0; }
+body:not(.dark) .askai-card { border-color: #e2e8f0; }
+body:not(.dark) .copy-btn:hover { background: #f1f5f9; }
+body:not(.dark) .confidence-track { background: #e2e8f0; }
+body:not(.dark) .source-hdr { border-color: #e2e8f0; }
+body:not(.dark) .answer-border { border-color: rgba(59,130,246,0.15); }
+body:not(.dark) .escalation-box { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.2); }
+body:not(.dark) .feedback-bar { border-color: #f1f5f9; }
+body:not(.dark) .feedback-btn { color: #94a3b8; }
+body:not(.dark) .feedback-btn:hover { background: rgba(16,185,129,0.08); color: #059669; }
+body:not(.dark) .reask-btn:hover { color: #1e293b; background: #f8fafc; }
+body:not(.dark) .source-expand-card { background: #f8fafc; border-color: #e2e8f0; }
+
+/* ============================================================
+   RAISE QUERY PAGE
+   ============================================================ */
+
+body:not(.dark) .wizard-step-line { background: #e2e8f0; }
+body:not(.dark) .wizard-label { color: #475569; }
+body:not(.dark) .wizard-step-text-active { color: #1e293b; }
+body:not(.dark) .wizard-step-text-done { color: #64748b; }
+body:not(.dark) .wizard-step-text-pending { color: #94a3b8; }
+body:not(.dark) .wizard-btn {
+  background: #f1f5f9; border-color: #cbd5e1; color: #475569;
+}
+body:not(.dark) .wizard-btn:hover { background: #e2e8f0; color: #1e293b; }
+body:not(.dark) .wizard-btn-secondary {
+  background: #f1f5f9; border-color: #cbd5e1; color: #334155;
+}
+body:not(.dark) .wizard-btn-secondary:hover { background: #e2e8f0; }
+body:not(.dark) .category-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .category-card:hover { border-color: rgba(245,158,11,0.3); background: #fffbeb; }
+body:not(.dark) .category-card-selected { border-color: rgba(245,158,11,0.5); background: #fffbeb; }
+body:not(.dark) .duplicate-card { background: #fffbeb; }
+body:not(.dark) .step-indicator-pending { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+body:not(.dark) .step-indicator-current { background: rgba(59,130,246,0.15); color: #3b82f6; }
+body:not(.dark) .step-indicator-done { background: rgba(16,185,129,0.15); color: #059669; }
+body:not(.dark) .refined-improved { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.2); }
+body:not(.dark) .refined-label { color: #7c3aed; }
+body:not(.dark) .refined-text { color: #1e293b; }
+body:not(.dark) .use-refined {
+  background: rgba(139,92,246,0.15); color: #7c3aed; border-color: rgba(139,92,246,0.2);
+}
+body:not(.dark) .use-refined:hover { background: rgba(139,92,246,0.2); }
+body:not(.dark) .keep-original { color: #64748b; }
+body:not(.dark) .keep-original:hover { color: #334155; }
+body:not(.dark) .suggested-tag { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+body:not(.dark) .suggested-tag:hover { background: #f1f5f9; color: #334155; }
+body:not(.dark) .related-faq-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .related-faq-card:hover { background: #f1f5f9; }
+
+/* ============================================================
+   DISCUSSIONS PAGE
+   ============================================================ */
+
+body:not(.dark) .discussions-title { color: #1e293b; }
+body:not(.dark) .discussions-title:hover { color: #3b82f6; }
+body:not(.dark) .discussions-stat { color: #64748b; }
+body:not(.dark) .discussions-empty-icon { color: #cbd5e1; }
+body:not(.dark) .discussions-page-text { color: #64748b; }
+body:not(.dark) .discussions-border { border-color: #e2e8f0; }
+body:not(.dark) .no-query-icon { color: #cbd5e1; }
+body:not(.dark) .query-stat { color: #64748b; }
+body:not(.dark) .discussions-section-title { color: #1e293b; }
+
+/* ============================================================
+   QUERY DETAIL PAGE
+   ============================================================ */
+
+body:not(.dark) .detail-title { color: #1e293b; }
+body:not(.dark) .detail-content { color: #334155; }
+body:not(.dark) .detail-author { color: #475569; }
+body:not(.dark) .detail-meta { color: #64748b; }
+body:not(.dark) .detail-label { color: #334155; }
+body:not(.dark) .detail-ai-text { color: #1e293b; }
+body:not(.dark) .detail-answer-text { color: #334155; }
+body:not(.dark) .detail-no-answers { color: #64748b; }
+body:not(.dark) .detail-answer-label { color: #1e293b; }
+body:not(.dark) .detail-section-title { color: #1e293b; }
+body:not(.dark) .detail-faq-question { color: #334155; }
+body:not(.dark) .detail-faq-answer { color: #64748b; }
+body:not(.dark) .detail-faq-section { color: #3b82f6; }
+body:not(.dark) .detail-back-btn { color: #64748b; }
+body:not(.dark) .detail-back-btn:hover { color: #334155; }
+body:not(.dark) .detail-escalated-badge {
+  background: rgba(251,191,36,0.1); color: #92400e; border-color: rgba(251,191,36,0.2);
+}
+body:not(.dark) .detail-vote-up { border-color: #cbd5e1; color: #94a3b8; }
+body:not(.dark) .detail-vote-up:hover {
+  border-color: rgba(16,185,129,0.3); color: #059669; background: rgba(16,185,129,0.05);
+}
+body:not(.dark) .detail-vote-up-active {
+  background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.2); color: #059669;
+}
+body:not(.dark) .detail-vote-down { border-color: #cbd5e1; color: #94a3b8; }
+body:not(.dark) .detail-vote-down:hover {
+  border-color: rgba(244,63,94,0.3); color: #e11d48; background: rgba(244,63,94,0.05);
+}
+body:not(.dark) .detail-vote-down-active {
+  background: rgba(244,63,94,0.15); border-color: rgba(244,63,94,0.2); color: #e11d48;
+}
+body:not(.dark) .detail-tag { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+body:not(.dark) .detail-action-btn { border-color: #cbd5e1; color: #94a3b8; }
+body:not(.dark) .detail-action-btn:hover {
+  background: rgba(245,158,11,0.05); color: #d97706; border-color: rgba(245,158,11,0.3);
+}
+body:not(.dark) .detail-bookmark-active {
+  background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.2); color: #d97706;
+}
+body:not(.dark) .detail-separator { border-color: #f1f5f9; }
+body:not(.dark) .detail-toggle-track { background: #e2e8f0; border-color: #cbd5e1; }
+body:not(.dark) .detail-toggle-on { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+body:not(.dark) .escalation-msg { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+body:not(.dark) .escalation-msg-text { color: #92400e; }
+body:not(.dark) .edit-btn { background: #f8fafc; border-color: #e2e8f0; color: #334155; }
+body:not(.dark) .edit-btn:hover { background: #f1f5f9; }
+body:not(.dark) .answer-input { border-color: #e2e8f0; }
+body:not(.dark) .answer-input:focus { border-color: #3b82f6; }
+body:not(.dark) .submit-answer { background: #3b82f6; color: #fff; }
+body:not(.dark) .submit-answer:hover { background: #2563eb; }
+body:not(.dark) .answer-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .answer-card:hover { border-color: rgba(16,185,129,0.2); background: #f8fafc; }
+body:not(.dark) .answer-body { color: #334155; }
+body:not(.dark) .vote-btn { color: #94a3b8; }
+body:not(.dark) .vote-btn:hover { color: #3b82f6; background: rgba(59,130,246,0.05); }
+body:not(.dark) .vote-btn-active { color: #3b82f6; background: rgba(59,130,246,0.1); }
+body:not(.dark) .answered-badge { background: rgba(16,185,129,0.1); color: #059669; }
+body:not(.dark) .ai-answer-card { background: #fff; border-color: #e2e8f0; }
+body:not(.dark) .source-tag { background: #f1f5f9; color: #3b82f6; border-color: #cbd5e1; }
+body:not(.dark) .followup-tag { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+body:not(.dark) .toggle-track-on { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+body:not(.dark) .toggle-track-off { background: #e2e8f0; border-color: #cbd5e1; }
+
+/* ============================================================
+   FAQ BROWSER PAGE
+   ============================================================ */
+
+body:not(.dark) .faq-tag { background: #f1f5f9; color: #64748b; }
+body:not(.dark) .faq-related-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .faq-related-card:hover { background: #f1f5f9; }
+body:not(.dark) .explain-mode-btn { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+body:not(.dark) .explain-mode-btn:hover { border-color: #94a3b8; color: #334155; }
+
+/* ============================================================
+   PROFILE PAGE
+   ============================================================ */
+
+body:not(.dark) .preference-card { background: #f8fafc; border-color: #e2e8f0; }
+body:not(.dark) .preference-card:hover { background: #f1f5f9; }
+
+/* ============================================================
+   GENERAL — text on dark surfaces made visible in light mode
+   ============================================================ */
+
+body:not(.dark) .on-dark-bg { color: #1e293b; }
+body:not(.dark) .on-dark-bg-soft { color: #475569; }
+body:not(.dark) .on-dark-surface { color: #334155; }
+body:not(.dark) h1.on-dark-surface { color: #0f172a; }
+body:not(.dark) h2.on-dark-surface { color: #1e293b; }
+body:not(.dark) h3.on-dark-surface { color: #334155; }

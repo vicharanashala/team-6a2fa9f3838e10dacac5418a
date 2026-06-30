@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore, useThemeStore } from '../store';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { Sun, Moon, Monitor } from 'lucide-react';
 
 export default function Settings() {
-  const { user, updatePreferences, logout } = useAuthStore();
-  const navigate = useNavigate();
+  const { user, updatePreferences, updateUser } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,10 +62,14 @@ export default function Settings() {
 
   const handlePreferenceChange = async (key, value) => {
     setIsLoading(true);
+    const updatedPrefs = { ...preferences, [key]: value };
+    setPreferences(updatedPrefs);
+    if (key === 'theme') {
+      toggleTheme();
+    }
     try {
-      const updatedPrefs = { ...preferences, [key]: value };
-      await updatePreferences(updatedPrefs);
-      setPreferences(updatedPrefs);
+      const res = await api.patch('/auth/preferences', updatedPrefs);
+      updateUser(res.data.user);
       toast.success('Settings updated successfully!');
     } catch (err) {
       toast.error('Failed to update settings');
@@ -74,197 +78,194 @@ export default function Settings() {
     }
   };
 
-
   return (
-    <div className="min-h-screen p-6 md:p-12">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-100 mb-2">Settings</h1>
-          <p className="text-slate-400">Customize your experience</p>
+    <div className="max-w-2xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
+          <Monitor size={20} className="text-white" />
         </div>
+        <div>
+          <h1 className="text-xl font-bold dark:text-white text-slate-900">Settings</h1>
+          <p className="text-sm text-slate-500">Customize your experience</p>
+        </div>
+      </div>
 
-        {/* Settings Sections */}
-        <div className="space-y-6">
-          {/* Appearance */}
-          <div className="card-dark p-6">
-            <h2 className="text-xl font-bold text-slate-100 mb-6">Appearance</h2>
-            
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-6 border-b border-slate-700">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-200">Dark Mode</h3>
-                  <p className="text-sm text-slate-400 mt-1">Toggle between light and dark themes</p>
-                </div>
-                <button
-                  onClick={toggleTheme}
-                  disabled={isLoading}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    isDark ? 'bg-purple-600' : 'bg-slate-600'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      isDark ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-slate-200 mb-3">Theme Preference</h3>
-                <div className="space-y-3">
-                  {[
-                    { value: 'light', label: '☀️ Light', desc: 'Light theme for bright environments' },
-                    { value: 'dark', label: '🌙 Dark', desc: 'Dark theme for comfortable viewing' },
-                    { value: 'system', label: '🖥️ System', desc: 'Follow system preferences' }
-                  ].map(option => (
-                    <label key={option.value} className="flex items-center gap-4 p-3 bg-dark-600/50 rounded-lg cursor-pointer hover:bg-dark-600 transition-colors">
-                      <input
-                        type="radio"
-                        name="theme"
-                        value={option.value}
-                        checked={preferences.theme === option.value}
-                        onChange={(e) => handlePreferenceChange('theme', e.target.value)}
-                        disabled={isLoading}
-                        className="w-4 h-4"
-                      />
-                      <div>
-                        <p className="text-slate-200 font-medium">{option.label}</p>
-                        <p className="text-xs text-slate-400">{option.desc}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* AI Interaction */}
-          <div className="card-dark p-6">
-            <h2 className="text-xl font-bold text-slate-100 mb-6">AI Interaction</h2>
-            
+      <div className="space-y-5">
+        {/* Appearance */}
+        <div className="card-dark p-5">
+          <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
+            <Sun size={14} className="text-amber-400" /> Appearance
+          </h2>
+          <div className="flex items-center justify-between py-3 border-b dark:border-dark-500/50 border-slate-200/60">
             <div>
-              <h3 className="text-lg font-semibold text-slate-200 mb-3">Explanation Level</h3>
-              <p className="text-sm text-slate-400 mb-4">Choose how detailed AI explanations should be</p>
-              <div className="space-y-3">
-                {[
-                  { value: 'beginner', label: '👶 Beginner', desc: 'Simple explanations for basics' },
-                  { value: 'intermediate', label: '📚 Intermediate', desc: 'Balanced explanations (Recommended)' },
-                  { value: 'detailed', label: '🧑‍🎓 Detailed', desc: 'In-depth technical explanations' }
-                ].map(option => (
-                  <label key={option.value} className="flex items-center gap-4 p-3 bg-dark-600/50 rounded-lg cursor-pointer hover:bg-dark-600 transition-colors">
-                    <input
-                      type="radio"
-                      name="explainMode"
-                      value={option.value}
-                      checked={preferences.explainMode === option.value}
-                      onChange={(e) => handlePreferenceChange('explainMode', e.target.value)}
-                      disabled={isLoading}
-                      className="w-4 h-4"
-                    />
-                    <div>
-                      <p className="text-slate-200 font-medium">{option.label}</p>
-                      <p className="text-xs text-slate-400">{option.desc}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
+              <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Dark Mode</p>
+              <p className="text-xs text-slate-500 mt-0.5">Toggle between light and dark themes</p>
             </div>
+            <button
+              onClick={toggleTheme}
+              disabled={isLoading}
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                theme === 'dark' ? 'bg-blue-600' : 'dark:bg-slate-400 bg-slate-400'
+              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <span
+                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                  theme === 'dark' ? 'translate-x-1' : 'translate-x-7'
+                }`}
+              />
+            </button>
           </div>
 
-          {/* Notifications */}
-          <div className="card-dark p-6">
-            <h2 className="text-xl font-bold text-slate-100 mb-6">Notifications</h2>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-200">Enable Notifications</h3>
-                  <p className="text-sm text-slate-400 mt-1">Get alerts for important updates and messages</p>
-                </div>
-                <button
-                  onClick={() => handlePreferenceChange('notifications', !preferences.notifications)}
-                  disabled={isLoading}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    preferences.notifications ? 'bg-purple-600' : 'bg-slate-600'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      preferences.notifications ? 'translate-x-1' : 'translate-x-7'
-                    }`}
+          <div className="py-3">
+            <p className="text-sm font-medium dark:text-slate-200 text-slate-700 mb-3">Theme Preference</p>
+            <div className="space-y-2">
+              {[
+                { value: 'light', label: 'Light', icon: Sun, desc: 'Light theme for bright environments' },
+                { value: 'dark', label: 'Dark', icon: Moon, desc: 'Dark theme for comfortable viewing' },
+                { value: 'system', label: 'System', icon: Monitor, desc: 'Follow system preferences' }
+              ].map(option => (
+                <label key={option.value} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors settings-option-card">
+                  <input
+                    type="radio"
+                    name="themePref"
+                    value={option.value}
+                    checked={preferences.theme === option.value}
+                    onChange={(e) => handlePreferenceChange('theme', e.target.value)}
+                    disabled={isLoading}
+                    className="w-4 h-4 accent-blue-500"
                   />
-                </button>
-              </div>
-
-              {preferences.notifications && (
-                <div className="bg-dark-600/50 rounded-lg p-4 text-sm text-slate-300">
-                  <p className="mb-2 font-medium">You'll receive notifications for:</p>
-                  <ul className="space-y-1 text-xs">
-                    <li>✓ Answers to your queries</li>
-                    <li>✓ Mentions and comments</li>
-                    <li>✓ Important announcements</li>
-                    <li>✓ Activity updates</li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Privacy & Security */}
-          <div className="card-dark p-6">
-            <h2 className="text-xl font-bold text-slate-100 mb-6">Privacy & Security</h2>
-            
-            <div className="space-y-4">
-              <div className="pb-4">
-                <div className="flex items-center justify-between mb-4">
+                  <option.icon size={15} className="text-slate-400" />
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-200">Change Password</h3>
-                    <p className="text-sm text-slate-400 mt-1">Update your account password regularly</p>
+                    <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{option.label}</p>
+                    <p className="text-xs text-slate-500">{option.desc}</p>
                   </div>
-                  <button onClick={() => setIsChangingPassword(!isChangingPassword)} className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
-                    {isChangingPassword ? 'Cancel' : 'Change'}
-                  </button>
-                </div>
-                
-                {isChangingPassword && (
-                  <form onSubmit={handleChangePassword} className="space-y-4 mt-4 bg-dark-600/30 p-4 rounded-lg">
-                    <div>
-                      <label className="block text-sm text-slate-400 mb-1">Current Password</label>
-                      <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="w-full bg-dark-700 border border-slate-600 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-blue-500" required />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-slate-400 mb-1">New Password</label>
-                      <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-dark-700 border border-slate-600 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-blue-500" required />
-                    </div>
-                    <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50">
-                      Save Password
-                    </button>
-                  </form>
-                )}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* AI Interaction */}
+        <div className="card-dark p-5">
+          <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
+            <span className="text-lg">🤖</span> AI Interaction
+          </h2>
+          <div>
+            <p className="text-sm font-medium dark:text-slate-200 text-slate-700 mb-3">Explanation Level</p>
+            <p className="text-xs text-slate-500 mb-3">Choose how detailed AI explanations should be</p>
+            <div className="space-y-2">
+              {[
+                { value: 'beginner', label: 'Beginner', icon: '👶', desc: 'Simple explanations for basics' },
+                { value: 'intermediate', label: 'Intermediate', icon: '📚', desc: 'Balanced explanations (Recommended)' },
+                { value: 'detailed', label: 'Detailed', icon: '🧑‍🎓', desc: 'In-depth technical explanations' }
+              ].map(option => (
+                <label key={option.value} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors settings-option-card">
+                  <input
+                    type="radio"
+                    name="explainMode"
+                    value={option.value}
+                    checked={preferences.explainMode === option.value}
+                    onChange={(e) => handlePreferenceChange('explainMode', e.target.value)}
+                    disabled={isLoading}
+                    className="w-4 h-4 accent-blue-500"
+                  />
+                  <span className="text-base">{option.icon}</span>
+                  <div>
+                    <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{option.label}</p>
+                    <p className="text-xs text-slate-500">{option.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Notifications */}
+        <div className="card-dark p-5">
+          <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
+            <span className="text-lg">🔔</span> Notifications
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Enable Notifications</p>
+              <p className="text-xs text-slate-500 mt-0.5">Get alerts for important updates and messages</p>
+            </div>
+            <button
+              onClick={() => handlePreferenceChange('notifications', !preferences.notifications)}
+              disabled={isLoading}
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                preferences.notifications ? 'bg-blue-600' : 'dark:bg-slate-400 bg-slate-400'
+              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <span
+                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                  preferences.notifications ? 'translate-x-1' : 'translate-x-7'
+                }`}
+              />
+            </button>
+          </div>
+
+          {preferences.notifications && (
+            <div className="mt-3 p-3 bg-blue-500/5 border border-blue-500/10 rounded-xl text-xs dark:text-slate-400 text-slate-600">
+              <p className="mb-1.5 font-medium dark:text-slate-300 text-slate-700">You'll receive notifications for:</p>
+              <ul className="space-y-0.5 ml-3">
+                <li>✓ Answers to your queries</li>
+                <li>✓ Mentions and comments</li>
+                <li>✓ Important announcements</li>
+                <li>✓ Activity updates</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Privacy & Security */}
+        <div className="card-dark p-5">
+          <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
+            <span className="text-lg">🔒</span> Privacy & Security
+          </h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-3 border-b dark:border-dark-500/50 border-slate-200/60">
+              <div>
+                <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Change Password</p>
+                <p className="text-xs text-slate-500 mt-0.5">Update your account password regularly</p>
               </div>
+              <button className="btn-secondary text-sm py-1.5 px-3">Change</button>
             </div>
-          </div>
-
-          {/* Account Actions */}
-          <div className="card-dark p-6">
-            <h2 className="text-xl font-bold text-slate-100 mb-6">Account</h2>
-            
-            <div className="space-y-3">
-              <button onClick={handleDeleteAccount} disabled={isLoading} className="w-full px-4 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-left font-medium disabled:opacity-50">
-                ⚠️ Withdraw from internship and permanently delete your account
-              </button>
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Two-Factor Authentication</p>
+                <p className="text-xs text-slate-500 mt-0.5">Add an extra layer of security</p>
+              </div>
+              <button className="btn-secondary text-sm py-1.5 px-3">Enable</button>
             </div>
           </div>
         </div>
 
-        {/* Info Box */}
-        <div className="mt-8 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-          <p className="text-sm text-blue-300">
-            💡 Your preferences are saved automatically and synced across all your devices.
-          </p>
+        {/* Account Actions */}
+        <div className="card-dark p-5">
+          <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
+            <span className="text-lg">👤</span> Account
+          </h2>
+          <div className="space-y-2">
+            <button className="w-full px-4 py-2.5 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2 settings-btn">
+              📥 Download Your Data
+            </button>
+            <button className="w-full px-4 py-2.5 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2 settings-btn">
+              🔒 Deactivate Account
+            </button>
+            <button className="w-full px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2">
+              ⚠️ Delete Account Permanently
+            </button>
+          </div>
         </div>
+      </div>
+
+      {/* Info Box */}
+      <div className="mt-6 p-3.5 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+        <p className="text-xs dark:text-blue-300 text-blue-600">
+          💡 Your preferences are saved automatically and synced across all your devices.
+        </p>
       </div>
     </div>
   );

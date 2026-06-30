@@ -1,75 +1,56 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* =========================================================
+   globals.css — Entry point; imports all partial stylesheets.
+   Architecture:
+     theme.css       — CSS vars, scrollbar, focus ring
+     components.css  — Core components (cards, buttons, badges, forms)
+     admin.css       — Admin panel, filters, chips, category buttons
+     animations.css  — Keyframes and animated utilities
+     utilities.css   — Light-mode token fallbacks, page-specific classes
+   ========================================================= */
+
+@import './theme.css';
+@import './components.css';
+@import './admin.css';
+@import './animations.css';
+@import './utilities.css';
+
+/* ============================================================
+   @layer base — root variables, body, scrollbar, selection
+   ============================================================ */
 
 @layer base {
   :root {
     --scrollbar-bg: #0D1117;
     --scrollbar-thumb: #253347;
-
-    /* Theme CSS Variables (Default: Dark Mode) */
-    --dark-900: 7 11 20;
-    --dark-800: 13 17 23;
-    --dark-750: 17 24 39;
-    --dark-700: 22 29 47;
-    --dark-600: 30 42 59;
-    --dark-500: 37 51 71;
-    --dark-400: 46 63 87;
-
-    --slate-50: 248 250 252;
-    --slate-100: 241 245 249;
-    --slate-200: 226 232 240;
-    --slate-300: 203 213 225;
-    --slate-400: 148 163 184;
-    --slate-500: 100 116 139;
-    --slate-600: 71 85 105;
-    --slate-700: 51 65 85;
-    --slate-800: 30 41 59;
-    --slate-900: 15 23 42;
-  }
-
-  body.light {
-    --scrollbar-bg: #f1f5f9;
-    --scrollbar-thumb: #cbd5e1;
-
-    /* Theme CSS Variables (Light Mode) */
-    --dark-900: 248 250 252; /* light page background */
-    --dark-800: 255 255 255; /* light card/header background */
-    --dark-750: 241 245 249;
-    --dark-700: 241 245 249;
-    --dark-600: 226 232 240; /* light active item background */
-    --dark-500: 203 213 225; /* light borders */
-    --dark-400: 203 213 225;
-
-    --slate-50: 15 23 42;  /* inverted */
-    --slate-100: 30 41 59; /* inverted text */
-    --slate-200: 51 65 85;
-    --slate-300: 71 85 105;
-    --slate-400: 71 85 105; /* darker slate for readability on white/light bg */
-    --slate-500: 100 116 139;
-    --slate-600: 148 163 184;
-    --slate-700: 203 213 225; /* inputs background etc become light */
-    --slate-800: 241 245 249; /* card gradients become light */
-    --slate-900: 248 250 252; /* page backgrounds become light */
   }
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+
   body {
-    @apply bg-dark-900 text-slate-100 font-sans antialiased;
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
-  }
-  body.light {
-    @apply bg-dark-900 text-slate-100;
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(0,0,0,0.04)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
+    background-color: #030712;
+    color: #e2e8f0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='1'/%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.08) 0%, transparent 60%);
   }
 
-  body.light mark {
-    background-color: rgba(245, 158, 11, 0.4);
-    color: #92400e;
-    border-radius: 2px;
-    padding: 0 2px;
+  /* Light theme — add .dark class to <body> to enable dark mode */
+  body:not(.dark) {
+    background-color: #f8fafc;
+    color: #0f172a;
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(0,0,0,0.035)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.06) 0%, transparent 60%);
   }
+
+  body:not(.dark) ::-webkit-scrollbar-track { background: #f1f5f9; }
+  body:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  body:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+  body:not(.dark) ::selection { background: rgba(59,130,246,0.2); color: inherit; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
@@ -77,102 +58,4 @@
   ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
 
   ::selection { background: rgba(59,130,246,0.3); color: white; }
-}
-
-/* Light mode overrides for text-white */
-body.light [class~="text-white"] {
-  color: #0f172a !important;
-}
-/* Revert text-white for elements that must stay white */
-body.light .btn-primary [class~="text-white"],
-body.light .btn-primary[class~="text-white"],
-body.light button [class~="text-white"],
-body.light button[class~="text-white"],
-body.light [class*="bg-gradient-"] [class~="text-white"],
-body.light [class*="bg-gradient-"][class~="text-white"],
-body.light [class*="bg-blue-"] [class~="text-white"],
-body.light [class*="bg-blue-"][class~="text-white"],
-body.light [class*="bg-purple-"] [class~="text-white"],
-body.light [class*="bg-purple-"][class~="text-white"],
-body.light [class*="bg-violet-"] [class~="text-white"],
-body.light [class*="bg-violet-"][class~="text-white"],
-body.light [class*="bg-emerald-"] [class~="text-white"],
-body.light [class*="bg-emerald-"][class~="text-white"],
-body.light [class*="bg-amber-"] [class~="text-white"],
-body.light [class*="bg-amber-"][class~="text-white"],
-body.light [class*="bg-rose-"] [class~="text-white"],
-body.light [class*="bg-rose-"][class~="text-white"],
-body.light .badge-high,
-body.light .badge-medium,
-body.light .badge-low {
-  color: #ffffff !important;
-}
-
-
-@layer components {
-  .glass {
-    @apply backdrop-blur-xl bg-white/5 border border-white/10;
-  }
-  .glass-light {
-    @apply backdrop-blur-xl bg-white/80 border border-slate-200/60;
-  }
-  .card-dark {
-    @apply bg-dark-700 border border-dark-500/50 rounded-2xl;
-  }
-  .card-hover {
-    @apply transition-all duration-200 hover:border-blue-500/30 hover:bg-dark-600/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5;
-  }
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
-  }
-  .btn-secondary {
-    @apply bg-dark-600 hover:bg-dark-500 text-slate-300 hover:text-white border border-dark-400 font-medium px-5 py-2.5 rounded-xl transition-all duration-200;
-  }
-  .btn-ghost {
-    @apply text-slate-400 hover:text-slate-200 hover:bg-dark-600 font-medium px-4 py-2 rounded-xl transition-all duration-200;
-  }
-  .input-dark {
-    @apply bg-dark-700 border border-dark-400 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 w-full focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200;
-  }
-  .badge-high { @apply bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
-  .badge-medium { @apply bg-amber-500/15 text-amber-400 border border-amber-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
-  .badge-low { @apply bg-rose-500/15 text-rose-400 border border-rose-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
-  .badge-category { @apply bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
-  .gradient-text { @apply bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent; }
-  .glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.15); }
-  .noise-overlay {
-    position: relative;
-  }
-  .noise-overlay::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0.3;
-  }
-  .typing-dot {
-    @apply w-1.5 h-1.5 rounded-full bg-blue-400;
-    animation: typingBounce 1.4s infinite;
-  }
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-}
-
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-6px); opacity: 1; }
-}
-
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-.confidence-bar {
-  background: linear-gradient(90deg, #10B981, #3B82F6);
-  border-radius: 4px;
-  height: 4px;
-  transition: width 1s ease;
 }

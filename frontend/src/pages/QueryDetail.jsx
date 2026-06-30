@@ -18,7 +18,7 @@ function ConfidenceMeter({ level, score }) {
           style={{ background: colors[level] || colors.medium }}
           className="h-full rounded-full" />
       </div>
-      <span className="text-xs font-mono text-slate-400 w-12">{score?.toFixed(0)}%</span>
+      <span className="text-xs font-mono text-slate-400 dark:text-slate-400 text-slate-600 w-12">{score?.toFixed(0)}%</span>
     </div>
   )
 }
@@ -36,9 +36,9 @@ function AIAnswerCard({ aiAnswer }) {
               <Brain size={15} className="text-white" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white flex items-center gap-2">
+              <div className="text-sm font-semibold dark:text-white text-slate-900 flex items-center gap-2">
                 VINS AI
-                <span className="text-xs bg-blue-500/15 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-blue-500/15 border border-blue-500/20 text-blue-400 dark:text-blue-400 text-blue-600 px-2 py-0.5 rounded-full">
                   RAG-Grounded
                 </span>
               </div>
@@ -70,7 +70,7 @@ function AIAnswerCard({ aiAnswer }) {
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
             <div className="p-5">
-              <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">{aiAnswer.content}</div>
+              <div className="dark:text-slate-200 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{aiAnswer.content}</div>
             </div>
 
             {aiAnswer.escalationRequired && (
@@ -86,7 +86,7 @@ function AIAnswerCard({ aiAnswer }) {
             {aiAnswer.sourceSections?.length > 0 && (
               <div className="px-5 pb-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-slate-600">Based on:</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-600 text-slate-500">Based on:</span>
                   {aiAnswer.sourceSections.map((s, i) => (
                     <span key={i} className="text-xs font-mono bg-dark-700 text-blue-400 px-2 py-0.5 rounded-md border border-dark-500">{s}</span>
                   ))}
@@ -96,12 +96,12 @@ function AIAnswerCard({ aiAnswer }) {
 
             {aiAnswer.followUpSuggestions?.length > 0 && (
               <div className="px-5 pb-5">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-500 text-slate-600 mb-2">
                   <Sparkles size={12} /> Related questions you might have:
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {aiAnswer.followUpSuggestions.map((q, i) => (
-                    <span key={i} className="text-xs bg-dark-700 border border-dark-500/50 text-slate-400 px-3 py-1.5 rounded-xl">
+                    <span key={i} className="text-xs bg-dark-700 border border-dark-500/50 text-slate-400 dark:text-slate-400 text-slate-600 px-3 py-1.5 rounded-xl">
                       {q}
                     </span>
                   ))}
@@ -136,7 +136,7 @@ function AnswerCard({ answer, onVote, user, onAddToKB }) {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-slate-200">{answer.author?.name || 'Anonymous'}</span>
+            <span className="text-sm font-medium dark:text-slate-200 text-slate-700">{answer.author?.name || 'Anonymous'}</span>
             {answer.author?.role === 'mentor' && (
               <span className="text-xs bg-violet-500/15 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <Shield size={10} /> Mentor
@@ -155,7 +155,7 @@ function AnswerCard({ answer, onVote, user, onAddToKB }) {
         </div>
       </div>
 
-      <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap ml-11">{answer.content}</div>
+      <div className="dark:text-slate-200 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap ml-11">{answer.content}</div>
 
       <div className="flex items-center gap-3 mt-4 ml-11">
         <button onClick={() => onVote(answer._id, 'up')}
@@ -282,7 +282,7 @@ export default function QueryDetail() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       {/* Back */}
-      <button onClick={() => navigate('/discussions')} className="flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors text-sm">
+      <button onClick={() => navigate('/discussions')} className="flex items-center gap-2 text-slate-500 dark:text-slate-600 hover:text-slate-300 dark:hover:text-slate-700 transition-colors text-sm detail-back-btn">
         <ArrowLeft size={16} /> Back to Discussions
       </button>
 
@@ -291,7 +291,7 @@ export default function QueryDetail() {
         <div className="flex flex-wrap gap-2 mb-3">
           <span className="badge-category">{query.category}</span>
           {query.tags?.map(t => (
-            <span key={t} className="text-xs text-slate-600 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>
+            <span key={t} className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>
           ))}
           {query.isEscalated && (
             <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -299,9 +299,9 @@ export default function QueryDetail() {
             </span>
           )}
         </div>
-        <h1 className="text-xl font-bold text-white mb-2">{query.refinedTitle || query.title}</h1>
+        <h1 className="text-xl font-bold dark:text-white mb-2 discussions-title">{query.refinedTitle || query.title}</h1>
         {query.refinedTitle && query.refinedTitle !== query.title && (
-          <p className="text-xs text-slate-600 mb-3">Original: "{query.title}"</p>
+          <p className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 mb-3">Original: "{query.title}"</p>
         )}
         <p className="text-slate-300 leading-relaxed">{query.content}</p>
 
@@ -316,7 +316,7 @@ export default function QueryDetail() {
         )}
 
         <div className="flex items-center justify-between mt-5 pt-4 border-t border-dark-500/50">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-600 discussions-meta">
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white text-[10px] font-bold">
               {query.author?.name?.charAt(0).toUpperCase()}
             </div>
@@ -346,18 +346,18 @@ export default function QueryDetail() {
       {/* Related FAQs */}
       {query.relatedFAQs?.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-medium text-slate-400 dark:text-slate-600 mb-3 flex items-center gap-2 discussions-section-title">
             <BookOpen size={14} /> Related FAQ entries
           </h3>
           <div className="grid gap-2">
             {query.relatedFAQs.map(faq => (
               <div key={faq._id} className="card-dark p-4 border-blue-500/10">
                 <div className="flex items-center gap-2 mb-1">
-                  {faq.sectionId && <span className="text-xs font-mono text-blue-400">§{faq.sectionId}</span>}
+                  {faq.sectionId && <span className="text-xs font-mono text-blue-400 dark:text-blue-400 text-blue-600">§{faq.sectionId}</span>}
                   <span className="badge-category">{faq.category}</span>
                 </div>
-                <p className="text-sm font-medium text-slate-300">{faq.question}</p>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{faq.answer}</p>
+                <p className="text-sm font-medium dark:text-slate-300 text-slate-700">{faq.question}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500 text-slate-500 mt-1 line-clamp-2">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -366,13 +366,13 @@ export default function QueryDetail() {
 
       {/* Community Answers */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-semibold dark:text-white discussions-section-title mb-4 flex items-center gap-2">
           Answers <span className="text-sm text-slate-500 font-normal">({query.answers?.length || 0})</span>
         </h3>
         {query.answers?.length === 0
           ? (
             <div className="card-dark p-8 text-center">
-              <p className="text-slate-500">No community answers yet. Be the first to help!</p>
+              <p className="text-slate-500 dark:text-slate-600 detail-no-answers">No community answers yet. Be the first to help!</p>
             </div>
           )
           : (
@@ -389,7 +389,7 @@ export default function QueryDetail() {
       {/* Add Answer */}
       {token && (
         <div className="card-dark p-5">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-sm font-semibold dark:text-white text-slate-300 mb-4 flex items-center gap-2 detail-answer-label">
             <Plus size={16} /> Your Answer
           </h3>
           <form onSubmit={handleAnswer}>
@@ -403,7 +403,7 @@ export default function QueryDetail() {
                   <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${addToKB ? 'left-5' : 'left-0.5'}`} />
                 </div>
                 <div>
-                  <span className="text-sm text-slate-300 flex items-center gap-1.5">
+                  <span className="text-sm dark:text-slate-300 text-slate-700 flex items-center gap-1.5">
                     <Database size={13} className="text-blue-400" /> Add to Knowledge Base
                   </span>
                   <p className="text-xs text-slate-600">Future AI answers will use this answer as a source</p>

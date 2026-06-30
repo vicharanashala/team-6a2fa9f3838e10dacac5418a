@@ -1,0 +1,50 @@
+/* =========================================================
+   animations.css — Keyframe animations + transition utilities
+   ========================================================= */
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+
+/* Typing dot bounce */
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Scanline sweep */
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* ============================================================
+   ANIMATED UTILITY CLASSES
+   ============================================================ */
+
+/* Typing dots */
+.typing-dot {
+  @apply w-1.5 h-1.5 rounded-full bg-blue-400;
+  animation: typingBounce 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Confidence bar */
+.confidence-bar {
+  background: linear-gradient(90deg, #10B981, #3B82F6);
+  border-radius: 4px;
+  height: 4px;
+  transition: width 1s ease;
+}
+
+/* Typed cursor blink */
+.typed-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: typingBounce 1s infinite;
+}
+body:not(.dark) .typed-cursor { background: #3B82F6; }

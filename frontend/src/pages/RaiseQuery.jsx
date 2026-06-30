@@ -109,7 +109,7 @@ export default function RaiseQuery() {
           <MessageSquarePlus size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white">Raise a Query</h1>
+          <h1 className="text-xl font-bold dark:text-white discussions-title">Raise a Query</h1>
           <p className="text-sm text-slate-500">AI checks for duplicates and related FAQs before you post</p>
         </div>
       </div>
@@ -119,14 +119,14 @@ export default function RaiseQuery() {
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-emerald-600 text-white' : 'bg-dark-600 text-slate-500'
+              step === s ? 'step-indicator-current' : step > s ? 'step-indicator-done' : 'step-indicator-pending'
             }`}>
               {step > s ? <CheckCircle size={14} /> : s}
             </div>
-            <span className={`text-sm ${step === s ? 'text-slate-200' : 'text-slate-600'}`}>
+            <span className={`text-sm ${step === s ? 'dark:text-slate-200 text-slate-700' : 'text-slate-600 dark:text-slate-600 text-slate-500'}`}>
               {s === 1 ? 'Describe Issue' : s === 2 ? 'AI Review' : 'Posted'}
             </span>
-            {s < 3 && <div className="w-8 h-px bg-dark-500 mx-1" />}
+            {s < 3 && <div className="w-8 h-px bg-dark-500 dark:bg-dark-500 bg-slate-300 mx-1" />}
           </div>
         ))}
       </div>
@@ -137,7 +137,7 @@ export default function RaiseQuery() {
             className="space-y-5">
             {/* Title */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-2 block">Question title *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Question title *</label>
               <div className="flex gap-2">
                 <input value={form.title} onChange={e => { setForm(f => ({ ...f, title: e.target.value })); setRefined(null) }}
                   className="input-dark flex-1" placeholder="What is your question? Be specific." />
@@ -154,7 +154,7 @@ export default function RaiseQuery() {
                     <Wand2 size={12} className="text-violet-400" />
                     <span className="text-xs text-violet-400 font-medium">AI suggested improvement</span>
                   </div>
-                  <p className="text-sm text-slate-200">{refined}</p>
+                  <p className="text-sm dark:text-slate-200 text-slate-700">{refined}</p>
                   <div className="flex gap-2 mt-2">
                     <button onClick={() => { setForm(f => ({ ...f, title: refined })); setRefined(null) }}
                       className="text-xs bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 px-3 py-1 rounded-lg transition-colors">
@@ -170,14 +170,12 @@ export default function RaiseQuery() {
 
             {/* Category */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-3 block">Category *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-3 block">Category *</label>
               <div className="grid grid-cols-3 gap-2">
                 {CATEGORIES.map(cat => (
                   <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))}
                     className={`px-3 py-2 rounded-xl text-sm border transition-all ${
-                      form.category === cat
-                        ? 'bg-blue-600/20 border-blue-500/40 text-blue-300'
-                        : 'bg-dark-700 border-dark-500/50 text-slate-400 hover:text-slate-200 hover:border-dark-400'
+                      form.category === cat ? 'category-btn-active' : 'category-btn'
                     }`}>
                     {cat}
                   </button>
@@ -187,11 +185,11 @@ export default function RaiseQuery() {
 
             {/* Content */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-2 block">Describe your issue *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Describe your issue *</label>
               <textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
                 className="input-dark resize-none" rows={5}
                 placeholder="Provide full context. What did you try? What error or confusion are you facing? The more specific, the better the AI answer will be." />
-              <p className="text-xs text-slate-600 mt-1.5">{form.content.length} characters · Be specific for better AI matching</p>
+              <p className="text-xs text-slate-500 mt-1.5">{form.content.length} characters · Be specific for better AI matching</p>
             </div>
 
             {/* Screenshots */}
@@ -218,7 +216,7 @@ export default function RaiseQuery() {
 
             {/* Tags */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-3 block">Tags (optional)</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-3 block">Tags (optional)</label>
               <div className="flex flex-wrap gap-2 mb-3">
                 {form.tags.map(tag => (
                   <span key={tag} className="badge-category flex items-center gap-1">
@@ -232,7 +230,7 @@ export default function RaiseQuery() {
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {TAG_SUGGESTIONS.filter(t => !form.tags.includes(t)).map(t => (
                   <button key={t} onClick={() => addTag(t)}
-                    className="text-xs text-slate-500 hover:text-slate-300 bg-dark-700 hover:bg-dark-600 border border-dark-500/50 px-2 py-1 rounded-lg transition-colors">
+                    className="text-xs text-slate-500 dark:text-slate-500 text-slate-600 hover:text-slate-300 bg-dark-700 hover:bg-dark-600 border border-dark-500/50 px-2 py-1 rounded-lg transition-colors">
                     + {t}
                   </button>
                 ))}
@@ -255,16 +253,16 @@ export default function RaiseQuery() {
         {step === 2 && (
           <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
             className="space-y-5">
-            <h2 className="text-lg font-semibold text-white">AI Pre-Check Results</h2>
+            <h2 className="text-lg font-semibold dark:text-white">AI Pre-Check Results</h2>
 
             {/* Duplicate warning */}
             {duplicates?.hasDuplicates && (
-              <div className="card-dark border-amber-500/20 p-5">
+              <div className="card-dark duplicate-card border-amber-500/20 p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle size={16} className="text-amber-400" />
                   <span className="text-sm font-medium text-amber-300">Similar questions found!</span>
                 </div>
-                <p className="text-xs text-slate-500 mb-3">Check these before posting — your answer might already exist:</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500 text-slate-500 mb-3">Check these before posting — your answer might already exist:</p>
                 <div className="space-y-2">
                   {duplicates.similarQueries.map(q => (
                     <button key={q.id} onClick={() => navigate(`/discussions/${q.id}`)}
@@ -273,7 +271,7 @@ export default function RaiseQuery() {
                         <span className="badge-category">{q.category}</span>
                         <span className="text-xs text-slate-500">{q.similarity}% similar</span>
                       </div>
-                      <p className="text-sm text-slate-300">{q.title}</p>
+                      <p className="text-sm dark:text-slate-300 text-slate-700">{q.title}</p>
                     </button>
                   ))}
                 </div>
@@ -290,11 +288,11 @@ export default function RaiseQuery() {
                 <p className="text-xs text-slate-500 mb-3">These FAQs might answer your question directly:</p>
                 <div className="space-y-2">
                   {duplicates.relatedFAQs.map(faq => (
-                    <div key={faq.id} className="p-3 bg-dark-700 rounded-xl border border-dark-500/50">
+                    <div key={faq.id} className="p-3 bg-dark-700 rounded-xl border border-dark-500/50 related-faq-card">
                       {faq.sectionId && <span className="text-xs font-mono text-blue-400 mr-2">§{faq.sectionId}</span>}
                       <span className="badge-category mb-1.5 inline-block">{faq.category}</span>
-                      <p className="text-sm font-medium text-slate-200">{faq.question}</p>
-                      <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{faq.answer}</p>
+                      <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{faq.question}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-500 text-slate-500 mt-1.5 line-clamp-2">{faq.answer}</p>
                     </div>
                   ))}
                 </div>

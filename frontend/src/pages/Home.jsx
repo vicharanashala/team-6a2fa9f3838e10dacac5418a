@@ -53,9 +53,10 @@ export default function Home() {
         api.get('/queries/trending').catch(() => ({ data: [] })),
         api.get('/faq/categories').catch(() => ({ data: [] })),
       ])
-      setInsight(insightRes.data)
-      setTrending(trendingRes.data || [])
-      setCategoryStats(catRes.data || [])
+      // Normalize: handle both array responses and object wrappers like { queries: [...] }
+      setInsight(insightRes.data?.insight ? insightRes.data : { insight: insightRes.data })
+      setTrending(Array.isArray(trendingRes.data) ? trendingRes.data : (trendingRes.data?.queries || []))
+      setCategoryStats(Array.isArray(catRes.data) ? catRes.data : (catRes.data?.categories || []))
     } catch (e) {}
     setLoadingInsight(false)
   }
@@ -76,7 +77,7 @@ export default function Home() {
           <Sparkles size={14} />
           AI Intelligence Platform · Summership 2026
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-bold dark:text-white text-slate-900 mb-4 tracking-tight">
           Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0]}</span>
         </h1>
         <p className="text-slate-400 text-lg max-w-xl mx-auto mb-8">
@@ -86,10 +87,10 @@ export default function Home() {
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
           <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder='Ask anything — "NOC deadline", "videos repeating", "offer letter format"...'
-              className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl bg-dark-700 border-dark-400 focus:border-blue-500/60" />
+              className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl border-slate-300 focus:border-blue-500/60" />
             <button type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-2 px-4 text-sm flex items-center gap-1.5">
               Ask AI <Brain size={14} />
@@ -109,15 +110,15 @@ export default function Home() {
             <ImageIcon size={15} /> Ask with Photo
           </button>
           <button onClick={() => navigate('/raise-query')}
-            className="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-500 text-slate-300 rounded-xl px-4 py-2 text-sm transition-all">
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all quick-action-btn-home">
             <MessageSquarePlus size={15} /> Raise Query
           </button>
           <button onClick={() => navigate('/discussions')}
-            className="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-500 text-slate-300 rounded-xl px-4 py-2 text-sm transition-all">
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all quick-action-btn-home">
             <Users size={15} /> Discussions
           </button>
           <button onClick={() => navigate('/faq')}
-            className="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-500 text-slate-300 rounded-xl px-4 py-2 text-sm transition-all">
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all quick-action-btn-home">
             <BookOpen size={15} /> Browse FAQ
           </button>
         </div>
@@ -136,8 +137,8 @@ export default function Home() {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               </div>
               {loadingInsight
-                ? <div className="text-slate-300"><TypingDots /></div>
-                : <p className="text-slate-200">{insight?.insight}</p>}
+                ? <div className="dark:text-slate-300 text-slate-600"><TypingDots /></div>
+                : <p className="dark:text-slate-200 text-slate-700">{insight?.insight}</p>}
               {insight?.trendingCategories?.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {insight.trendingCategories.map(c => (
@@ -155,7 +156,7 @@ export default function Home() {
         <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <div className="flex items-center gap-2 mb-4">
             <Flame size={16} className="text-amber-400" />
-            <h2 className="font-semibold text-white">🔥 Trending Confusions Today</h2>
+            <h2 className="font-semibold dark:text-white">🔥 Trending Confusions Today</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {trending.map((q, i) => (
@@ -166,7 +167,7 @@ export default function Home() {
                     #{i + 1}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-sm text-slate-200 line-clamp-2 group-hover:text-white transition-colors">{q.title}</p>
+                    <p className="text-sm dark:text-slate-200 text-slate-700 line-clamp-2 group-hover:dark:text-white transition-colors">{q.title}</p>
                     <div className="flex items-center gap-2 mt-1.5">
                       <span className="badge-category">{q.category}</span>
                       <span className="text-xs text-slate-600">{q.views} views</span>
@@ -182,7 +183,7 @@ export default function Home() {
       {/* Category Grid */}
       <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-white flex items-center gap-2">
+          <h2 className="font-semibold dark:text-white flex items-center gap-2">
             <BookOpen size={16} className="text-slate-400" /> Knowledge Categories
           </h2>
           <button onClick={() => navigate('/faq')} className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1">
@@ -197,7 +198,7 @@ export default function Home() {
               onClick={() => navigate(`/faq?category=${cat.name}`)}
               className="card-dark card-hover p-4 text-left group">
               <div className="text-2xl mb-2">{cat.icon}</div>
-              <div className="font-medium text-slate-200 text-sm group-hover:text-white transition-colors">{cat.name}</div>
+              <div className="font-medium dark:text-slate-200 text-slate-700 text-sm group-hover:dark:text-white transition-colors">{cat.name}</div>
               <div className="text-xs text-slate-500 mt-0.5">{cat.desc}</div>
               <div className="text-xs text-slate-600 mt-2">{getCatCount(cat.name)} entries</div>
             </motion.button>
@@ -209,15 +210,15 @@ export default function Home() {
       <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <div className="flex items-center gap-2 mb-4">
           <AlertCircle size={16} className="text-amber-400" />
-          <h2 className="font-semibold text-white">Commonly Misunderstood</h2>
+          <h2 className="font-semibold dark:text-white">Commonly Misunderstood</h2>
           <span className="text-xs text-amber-400/70 bg-amber-400/10 border border-amber-400/20 rounded-full px-2 py-0.5">Read this first</span>
         </div>
-        <div className="card-dark border-amber-500/10 divide-y divide-dark-500/50">
+        <div className="card-dark misconception-card border-amber-500/10 divide-dark-500/50">
           {MISCONCEPTIONS.map((m, i) => (
-            <div key={i} className="p-4 flex items-start gap-3 hover:bg-dark-600/30 transition-colors">
+            <div key={i} className="p-4 flex items-start gap-3 dark:hover:bg-dark-600/30 hover:bg-slate-100/60 transition-colors">
               <AlertCircle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-slate-200">{m.text}</p>
+                <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{m.text}</p>
                 <p className="text-xs text-slate-500 mt-0.5">{m.detail}</p>
               </div>
             </div>
@@ -233,8 +234,8 @@ export default function Home() {
           <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center mb-4">
             <Brain size={20} className="text-blue-400" />
           </div>
-          <h3 className="font-semibold text-white mb-2">Ask the AI Assistant</h3>
-          <p className="text-sm text-slate-400 mb-4">Get instant, contextual answers grounded in the official FAQ. Confidence-rated responses with source citations.</p>
+          <h3 className="font-semibold dark:text-white mb-2">Ask the AI Assistant</h3>
+          <p className="text-sm dark:text-slate-400 text-slate-600 mb-4">Get instant, contextual answers grounded in the official FAQ. Confidence-rated responses with source citations.</p>
           <div className="flex items-center gap-1.5 text-blue-400 text-sm">Ask now <ArrowRight size={14} /></div>
         </button>
         <button onClick={() => navigate('/analytics')}
@@ -242,8 +243,8 @@ export default function Home() {
           <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4">
             <TrendingUp size={20} className="text-emerald-400" />
           </div>
-          <h3 className="font-semibold text-white mb-2">Confusion Analytics</h3>
-          <p className="text-sm text-slate-400 mb-4">See what topics are confusing 500+ interns. Real-time heatmaps, confidence trends, and FAQ gaps.</p>
+          <h3 className="font-semibold dark:text-white mb-2">Confusion Analytics</h3>
+          <p className="text-sm dark:text-slate-400 text-slate-600 mb-4">See what topics are confusing 500+ interns. Real-time heatmaps, confidence trends, and FAQ gaps.</p>
           <div className="flex items-center gap-1.5 text-emerald-400 text-sm">View analytics <ArrowRight size={14} /></div>
         </button>
       </motion.div>

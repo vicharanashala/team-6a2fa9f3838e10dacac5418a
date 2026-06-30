@@ -37,9 +37,11 @@ function QueryCard({ query, onClick }) {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+    <div
       onClick={onClick}
-      className="card-dark card-hover p-5 cursor-pointer group">
+      className="card-dark card-hover p-5 cursor-pointer group relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/5">
+      {/* Accent bar — visible on hover */}
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-l-xl" />
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -51,13 +53,13 @@ function QueryCard({ query, onClick }) {
               </span>
             )}
             {query.tags?.slice(0, 2).map(t => (
-              <span key={t} className="text-xs text-slate-600 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>
+              <span key={t} className="text-xs text-slate-500 px-2 py-0.5 rounded-full qa-tag">{t}</span>
             ))}
           </div>
-          <h3 className="font-medium text-slate-200 group-hover:text-white transition-colors line-clamp-2 mb-2">
+          <h3 className="font-medium discussions-title transition-colors line-clamp-2 mb-2 dark:text-slate-200 text-slate-700">
             {query.refinedTitle || query.title}
           </h3>
-          <p className="text-sm text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
         </div>
         {query.aiAnswer?.confidence && (
           <div className="flex-shrink-0">
@@ -72,7 +74,7 @@ function QueryCard({ query, onClick }) {
         )}
       </div>
 
-      <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
+      <div className="flex items-center gap-4 mt-3 text-xs discussions-stat">
         <span className="flex items-center gap-1">
           <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white text-[9px] font-bold">
             {query.author?.name?.charAt(0).toUpperCase()}
@@ -84,7 +86,7 @@ function QueryCard({ query, onClick }) {
         <span className="flex items-center gap-1"><Bookmark size={11} /> {query.bookmarks || 0}</span>
         <span className="flex items-center gap-1 ml-auto"><Clock size={11} /> {timeAgo(query.createdAt)}</span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -92,15 +94,15 @@ function SkeletonCard() {
   return (
     <div className="card-dark p-5 space-y-3 animate-pulse">
       <div className="flex gap-2">
-        <div className="h-5 w-20 bg-dark-600 rounded-full" />
-        <div className="h-5 w-16 bg-dark-600 rounded-full" />
+        <div className="h-5 w-20 rounded-full skeleton-base" />
+        <div className="h-5 w-16 skeleton-base rounded-full" />
       </div>
-      <div className="h-5 w-3/4 bg-dark-600 rounded" />
-      <div className="h-4 w-full bg-dark-600 rounded" />
-      <div className="h-4 w-2/3 bg-dark-600 rounded" />
+      <div className="h-5 w-3/4 skeleton-base rounded" />
+      <div className="h-4 w-full skeleton-base rounded" />
+      <div className="h-4 w-2/3 skeleton-base rounded" />
       <div className="flex gap-4">
-        <div className="h-4 w-16 bg-dark-600 rounded" />
-        <div className="h-4 w-12 bg-dark-600 rounded" />
+        <div className="h-4 w-16 skeleton-base rounded" />
+        <div className="h-4 w-12 skeleton-base rounded" />
       </div>
     </div>
   )
@@ -153,7 +155,7 @@ export default function Discussions() {
             <MessagesSquare size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">Discussions</h1>
+            <h1 className="text-xl font-bold dark:text-white discussions-title">Discussions</h1>
             <p className="text-sm text-slate-500">{total} questions · community Q&A</p>
           </div>
         </div>
@@ -166,10 +168,10 @@ export default function Discussions() {
 
       {/* Search */}
       <form onSubmit={handleSearch} className="relative mb-5">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search discussions..."
-          className="input-dark pl-10 pr-24" />
+          className="input-dark pl-11 pr-24" />
         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-3 text-sm">
           Search
         </button>
@@ -182,15 +184,13 @@ export default function Discussions() {
           {CATEGORIES.slice(0, 6).map(c => (
             <button key={c} onClick={() => { setCategory(c); setPage(1) }}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                category === c
-                  ? 'bg-blue-600/20 border-blue-500/30 text-blue-400'
-                  : 'border-dark-500 text-slate-500 hover:text-slate-300 bg-dark-700 hover:border-dark-400'
+                category === c ? 'filter-btn-active' : 'filter-btn'
               }`}>
               {c}
             </button>
           ))}
           <select value={category} onChange={e => { setCategory(e.target.value); setPage(1) }}
-            className="text-xs px-3 py-1.5 rounded-lg border border-dark-500 bg-dark-700 text-slate-400 focus:outline-none focus:border-blue-500/40">
+            className="text-xs px-3 py-1.5 rounded-lg border transition-all filter-btn">
             <option value="All">More categories...</option>
             {CATEGORIES.slice(6).map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -201,9 +201,7 @@ export default function Discussions() {
           {SORTS.map(s => (
             <button key={s.value} onClick={() => { setSort(s.value); setPage(1) }}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                sort === s.value
-                  ? 'bg-dark-600 border-dark-400 text-slate-200'
-                  : 'border-dark-500 text-slate-500 bg-dark-700 hover:text-slate-300'
+                sort === s.value ? 'sort-btn-active' : 'sort-btn'
               }`}>
               {s.label}
             </button>
@@ -216,9 +214,7 @@ export default function Discussions() {
         {STATUSES.map(s => (
           <button key={s} onClick={() => { setStatus(s); setPage(1) }}
             className={`text-xs px-3 py-1.5 rounded-full border transition-all capitalize ${
-              status === s
-                ? 'bg-dark-600 border-dark-400 text-slate-200'
-                : 'border-dark-600 text-slate-600 hover:text-slate-400'
+              status === s ? 'status-btn-active' : 'status-btn'
             }`}>
             {s}
           </button>
@@ -232,16 +228,23 @@ export default function Discussions() {
           : queries.length === 0
             ? (
               <div className="text-center py-20 card-dark">
-                <MessagesSquare size={40} className="text-slate-700 mx-auto mb-4" />
-                <p className="text-slate-400 font-medium">No discussions found</p>
-                <p className="text-slate-600 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
+                <MessagesSquare size={40} className="text-slate-300 dark:text-slate-300 text-slate-400 mx-auto mb-4" />
+                <p className="text-slate-400 dark:text-slate-400 text-slate-500 font-medium">No discussions found</p>
+                <p className="text-slate-500 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
                 <button onClick={() => navigate('/raise-query')} className="btn-primary mt-4 inline-flex items-center gap-2">
                   <Plus size={14} /> Raise a Query
                 </button>
               </div>
             )
-            : queries.map(q => (
-              <QueryCard key={q._id} query={q} onClick={() => navigate(`/discussions/${q._id}`)} />
+            : queries.map((q, i) => (
+              <motion.div
+                key={q._id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.04, 0.3) }}
+              >
+                <QueryCard query={q} onClick={() => navigate(`/discussions/${q._id}`)} />
+              </motion.div>
             ))
         }
       </div>

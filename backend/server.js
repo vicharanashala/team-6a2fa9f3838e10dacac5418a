@@ -12,6 +12,8 @@ const aiRoutes = require('./routes/ai');
 const analyticsRoutes = require('./routes/analytics');
 const announcementRoutes = require('./routes/announcements');
 const userRoutes = require('./routes/users');
+const adminAnalyticsRoutes = require('./routes/adminAnalytics');
+const adminRoutes = require('./routes/admin');
 const answerQueueRoutes = require('./routes/answerQueue');
 
 const app = express();
@@ -65,23 +67,28 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/answer-queue', answerQueueRoutes);
+app.use('/api/admin/analytics', adminAnalyticsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), platform: 'VINS AI Intelligence Platform' });
 });
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`🚀 VINS Backend running on port ${process.env.PORT || 5000}`);
+// Only start server + connect to MongoDB when run directly (not imported as module)
+if (require.main === module) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('✅ MongoDB connected');
+      app.listen(process.env.PORT || 5000, () => {
+        console.log(`🚀 VINS Backend running on port ${process.env.PORT || 5000}`);
+      });
+    })
+    .catch(err => {
+      console.error('❌ MongoDB connection failed:', err.message);
+      process.exit(1);
     });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1);
-  });
-
-module.exports = app;
+} else {
+  // Allow test suite to control connection manually
+  module.exports = app;
+}

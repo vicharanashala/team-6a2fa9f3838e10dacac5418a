@@ -1,0 +1,198 @@
+/* =========================================================
+   components.css — Reusable component classes
+   Organized by: core · buttons · badges · cards · admin · skeletons
+   ========================================================= */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   CORE UTILITIES
+   ============================================================ */
+
+.glass {
+  @apply backdrop-blur-xl bg-white/5 border border-white/10;
+}
+.glass-light {
+  @apply backdrop-blur-xl bg-white/80 border border-slate-200/60;
+}
+.glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.15); }
+
+/* Noise overlay */
+.noise-overlay { position: relative; }
+.noise-overlay::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  border-radius: inherit; pointer-events: none; opacity: 0.3;
+}
+
+/* ============================================================
+   CARD SYSTEM
+   ============================================================ */
+
+.card-dark {
+  @apply bg-dark-700 border border-dark-500/50 rounded-2xl;
+}
+.card-hover {
+  @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg
+         hover:border-blue-500/30 hover:bg-dark-600/50 hover:shadow-blue-500/5;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+}
+
+/* ============================================================
+   BUTTON SYSTEM
+   ============================================================ */
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl
+         transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25
+         hover:-translate-y-0.5 active:translate-y-0
+         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+}
+
+.btn-secondary {
+  @apply bg-dark-600 hover:bg-dark-500 text-slate-300 hover:text-white
+         border border-dark-400 font-medium px-5 py-2.5 rounded-xl transition-all duration-200;
+}
+
+.btn-ghost {
+  @apply text-slate-400 hover:text-slate-200 hover:bg-dark-600
+         font-medium px-4 py-2 rounded-xl transition-all duration-200;
+}
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+
+.input-dark {
+  @apply bg-dark-700 border border-dark-400 text-slate-100 placeholder-slate-500
+         rounded-xl px-4 py-3 w-full
+         focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20
+         transition-all duration-200;
+}
+
+/* ============================================================
+   BADGE SYSTEM
+   ============================================================ */
+
+.badge-category { @apply bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
+.badge-high     { @apply bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
+.badge-medium   { @apply bg-amber-500/15 text-amber-400 border border-amber-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
+.badge-low      { @apply bg-rose-500/15 text-rose-400 border border-rose-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
+
+/* Gradient text */
+.gradient-text { @apply bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent; }
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.status-open      { @apply bg-blue-500/10 text-blue-400 border border-blue-500/20; }
+.status-answered  { @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
+.status-resolved  { @apply bg-slate-500/10 text-slate-400 border border-slate-500/20; }
+.status-escalated { @apply bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+
+/* Priority */
+.priority-urgent    { @apply bg-rose-500/10 text-rose-400 border border-rose-500/20; }
+.priority-important { @apply bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+.priority-general   { @apply bg-blue-500/10 text-blue-400 border border-blue-500/20; }
+
+/* Importance */
+.importance-critical { @apply bg-rose-500/10 text-rose-400 border border-rose-500/20; }
+.importance-high     { @apply bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+.importance-medium   { @apply bg-blue-500/10 text-blue-400 border border-blue-500/20; }
+.importance-low      { @apply bg-slate-500/10 text-slate-400 border border-slate-500/20; }
+
+/* ============================================================
+   SKELETON LOADERS
+   ============================================================ */
+
+.skeleton       { @apply bg-dark-600 rounded animate-pulse; }
+.skeleton-text  { @apply bg-dark-600 rounded h-3; }
+.skeleton-base  { background: #334155; }
+.skeleton-dark-700 { background: #1e293b; }
+.skeleton-dark-600 { background: #253347; }
+.skeleton-dark-500 { background: #1e293b; }
+
+/* ============================================================
+   LIGHT MODE — CARD, BUTTON, FORM, BADGE
+   ============================================================ */
+
+body:not(.dark) .card-dark {
+  @apply bg-white border border-slate-200/80 shadow-sm;
+}
+body:not(.dark) .card-hover {
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+body:not(.dark) .card-hover:hover {
+  @apply border-blue-300 bg-slate-50;
+}
+
+body:not(.dark) .btn-primary {
+  @apply bg-blue-600 hover:bg-blue-500 text-white;
+}
+body:not(.dark) .btn-secondary {
+  @apply bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300;
+}
+body:not(.dark) .btn-ghost {
+  @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100;
+}
+body:not(.dark) .btn-ghost:hover { @apply bg-slate-100; }
+
+body:not(.dark) .input-dark {
+  @apply bg-white border border-slate-300 text-slate-900 placeholder-slate-400;
+}
+
+body:not(.dark) .badge-category { @apply bg-blue-100 text-blue-700 border border-blue-200; }
+body:not(.dark) .badge-high     { @apply bg-emerald-100 text-emerald-700 border border-emerald-200; }
+body:not(.dark) .badge-medium   { @apply bg-amber-100 text-amber-700 border border-amber-200; }
+body:not(.dark) .badge-low      { @apply bg-rose-100 text-rose-700 border border-rose-200; }
+body:not(.dark) .gradient-text {
+  @apply bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent;
+}
+
+/* Status badges — light */
+body:not(.dark) .status-open      { @apply bg-blue-50 text-blue-700 border-blue-200; }
+body:not(.dark) .status-answered  { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+body:not(.dark) .status-resolved  { @apply bg-slate-100 text-slate-600 border-slate-200; }
+body:not(.dark) .status-escalated { @apply bg-amber-50 text-amber-700 border-amber-200; }
+
+/* Priority — light */
+body:not(.dark) .priority-urgent    { @apply bg-rose-50 text-rose-700 border-rose-200; }
+body:not(.dark) .priority-important { @apply bg-amber-50 text-amber-700 border-amber-200; }
+body:not(.dark) .priority-general   { @apply bg-blue-50 text-blue-700 border-blue-200; }
+
+/* Importance — light */
+body:not(.dark) .importance-critical { @apply bg-rose-50 text-rose-700 border-rose-200; }
+body:not(.dark) .importance-high     { @apply bg-amber-50 text-amber-700 border-amber-200; }
+body:not(.dark) .importance-medium   { @apply bg-blue-50 text-blue-700 border-blue-200; }
+body:not(.dark) .importance-low      { @apply bg-slate-100 text-slate-600 border-slate-200; }
+
+/* Skeletons — light */
+body:not(.dark) .skeleton       { @apply bg-slate-200; }
+body:not(.dark) .skeleton-text  { @apply bg-slate-200; }
+body:not(.dark) .skeleton-base  { background: #e2e8f0; }
+body:not(.dark) .skeleton-dark-700 { background: #e2e8f0; }
+body:not(.dark) .skeleton-dark-600 { background: #cbd5e1; }
+body:not(.dark) .skeleton-dark-500 { background: #94a3b8; }
+
+/* Glass — light */
+body:not(.dark) .glass { @apply bg-white/80 border-slate-200/60; }
+body:not(.dark) .noise-overlay::before { opacity: 0.02; }
+
+/* ============================================================
+   STEP INDICATORS
+   ============================================================ */
+
+.step-future { @apply bg-dark-600 text-slate-500; }
+.step-active { @apply bg-blue-600 text-white; }
+.step-done   { @apply bg-emerald-600 text-white; }
+.step-indicator-pending { @apply bg-slate-200 text-slate-500; border-color: #e2e8f0; }
+.step-indicator-current { @apply bg-blue-600 text-white; }
+.step-indicator-done    { @apply bg-emerald-600 text-white; }
+
+body:not(.dark) .step-future { @apply bg-slate-200 text-slate-500; }
+body:not(.dark) .step-active { @apply bg-blue-600 text-white; }
+body:not(.dark) .step-done   { @apply bg-emerald-600 text-white; }

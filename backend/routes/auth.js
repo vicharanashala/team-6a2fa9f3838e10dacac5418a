@@ -10,11 +10,14 @@ const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, college, role } = req.body;
+    const { name, email, password, college } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required.' });
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) return res.status(400).json({ error: 'Email already registered.' });
-    const user = await User.create({ name, email, password, college, role: role === 'mentor' ? 'mentor' : 'student' });
+    // SECURITY: Always set role to 'student' during signup.
+    // Mentor and admin roles must be assigned by an existing admin only.
+    // This prevents privilege escalation via self-registration.
+    const user = await User.create({ name, email, password, college, role: 'student' });
     const token = signToken(user._id);
     res.status(201).json({ token, user });
   } catch (err) {
