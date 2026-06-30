@@ -3,17 +3,24 @@ import { motion } from 'framer-motion'
 import { Zap, Brain, BarChart3, Shield, ArrowRight, ChevronRight, Sparkles, TrendingUp, Users } from 'lucide-react'
 
 const features = [
-  { icon: Brain, title: 'RAG-Powered AI', desc: 'Answers grounded in real FAQ data. Zero hallucinations.', color: 'blue' },
-  { icon: Shield, title: 'Confidence Scoring', desc: 'Every answer rated High/Medium/Low with source citations.', color: 'violet' },
-  { icon: BarChart3, title: 'Confusion Analytics', desc: 'See what\'s confusing 500+ interns in real-time.', color: 'emerald' },
-  { icon: TrendingUp, title: 'Continuous Learning', desc: 'Platform grows smarter as mentors validate answers.', color: 'amber' },
+  { icon: Brain,     title: 'RAG-Powered AI',        desc: 'Answers grounded in real FAQ data. Zero hallucinations.',       color: 'blue'   },
+  { icon: Shield,    title: 'Confidence Scoring',    desc: 'Every answer rated High/Medium/Low with source citations.',   color: 'violet' },
+  { icon: BarChart3, title: 'Confusion Analytics',   desc: "See what's confusing 500+ interns in real-time.",             color: 'emerald'},
+  { icon: TrendingUp,title: 'Continuous Learning',   desc: 'Platform grows smarter as mentors validate answers.',         color: 'amber'  },
 ]
+
+const COLOR_MAP = {
+  blue:   { bg: 'bg-blue-500/15 border-blue-500/20',   text: 'text-blue-400'   },
+  violet: { bg: 'bg-violet-500/15 border-violet-500/20', text: 'text-violet-400' },
+  emerald:{ bg: 'bg-emerald-500/15 border-emerald-500/20', text: 'text-emerald-400'},
+  amber:  { bg: 'bg-amber-500/15 border-amber-500/20', text: 'text-amber-400'  },
+}
 
 const stats = [
   { value: '180+', label: 'FAQ Entries' },
   { value: '500+', label: 'Interns Served' },
-  { value: '94%', label: 'Query Resolution' },
-  { value: '0', label: 'Hallucinations' },
+  { value: '94%',  label: 'Query Resolution' },
+  { value: '0',    label: 'Hallucinations' },
 ]
 
 export default function Landing() {
@@ -36,30 +43,25 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        {/* Background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-blue-600/5 rounded-full blur-3xl" />
           <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-violet-600/8 rounded-full blur-3xl" />
         </div>
-
         <div className="max-w-4xl mx-auto text-center relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-sm text-blue-400 mb-8">
               <Sparkles size={14} />
               Vicharanashala × IIT Ropar · Summership 2026
             </div>
-
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
               AI-Powered{' '}
               <span className="gradient-text">Internship</span>
               <br />Intelligence Platform
             </h1>
-
             <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
               Reducing repetitive confusion through contextual AI assistance.
               Grounded in real FAQ data. Zero hallucinations. Built for 500+ interns.
             </p>
-
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/signup" className="btn-primary flex items-center gap-2 text-base px-8 py-3.5">
                 Start Using VINS <ArrowRight size={18} />
@@ -69,8 +71,6 @@ export default function Landing() {
               </Link>
             </div>
           </motion.div>
-
-          {/* Stats */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
             {stats.map((s, i) => (
@@ -91,17 +91,20 @@ export default function Landing() {
             <p className="text-slate-400 max-w-xl mx-auto">Every answer is retrieved from real FAQ data before Gemini generates a response. No guessing. No hallucinations.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
-            {features.map((f, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }} viewport={{ once: true }}
-                className="card-dark card-hover p-6">
-                <div className={`w-10 h-10 rounded-xl bg-${f.color}-500/15 border border-${f.color}-500/20 flex items-center justify-center mb-4`}>
-                  <f.icon size={20} className={`text-${f.color}-400`} />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
+            {features.map((f, i) => {
+              const cfg = COLOR_MAP[f.color] || COLOR_MAP.blue
+              return (
+                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }} viewport={{ once: true }}
+                  className="card-dark card-hover p-6">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${cfg.bg}`}>
+                    <f.icon size={20} className={cfg.text} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -113,11 +116,11 @@ export default function Landing() {
           <p className="text-slate-400 mb-12">Your question → FAQ retrieval → Gemini generation → Confident answer</p>
           <div className="flex flex-col gap-2">
             {[
-              { step: '01', title: 'You ask a question', sub: 'Typed into the AI interface' },
-              { step: '02', title: 'Similar FAQs retrieved', sub: 'Cosine similarity search across 180+ entries' },
-              { step: '03', title: 'Context sent to Gemini', sub: 'Only relevant FAQ context — not the whole internet' },
+              { step: '01', title: 'You ask a question',       sub: 'Typed into the AI interface' },
+              { step: '02', title: 'Similar FAQs retrieved',   sub: 'Cosine similarity search across 180+ entries' },
+              { step: '03', title: 'Context sent to Gemini',   sub: 'Only relevant FAQ context — not the whole internet' },
               { step: '04', title: 'Controlled answer generated', sub: 'With confidence score + source citations' },
-              { step: '05', title: 'Knowledge base grows', sub: 'Mentor-validated answers added back to FAQ DB' },
+              { step: '05', title: 'Knowledge base grows',     sub: 'Mentor-validated answers added back to FAQ DB' },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }} viewport={{ once: true }}

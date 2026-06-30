@@ -85,7 +85,7 @@ export default function Settings() {
                 { value: 'dark', label: 'Dark', icon: Moon, desc: 'Dark theme for comfortable viewing' },
                 { value: 'system', label: 'System', icon: Monitor, desc: 'Follow system preferences' }
               ].map(option => (
-                <label key={option.value} className="flex items-center gap-3 p-3 bg-dark-700 rounded-xl cursor-pointer hover:bg-dark-600/70 transition-colors">
+                <label key={option.value} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors settings-option-card">
                   <input
                     type="radio"
                     name="themePref"
@@ -120,7 +120,7 @@ export default function Settings() {
                 { value: 'intermediate', label: 'Intermediate', icon: '📚', desc: 'Balanced explanations (Recommended)' },
                 { value: 'detailed', label: 'Detailed', icon: '🧑‍🎓', desc: 'In-depth technical explanations' }
               ].map(option => (
-                <label key={option.value} className="flex items-center gap-3 p-3 bg-dark-700 rounded-xl cursor-pointer hover:bg-dark-600/70 transition-colors">
+                <label key={option.value} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors settings-option-card">
                   <input
                     type="radio"
                     name="explainMode"
@@ -208,10 +208,10 @@ export default function Settings() {
             <span className="text-lg">👤</span> Account
           </h2>
           <div className="space-y-2">
-            <button className="w-full px-4 py-2.5 bg-dark-700 hover:bg-dark-600 text-slate-300 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2">
+            <button className="w-full px-4 py-2.5 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2 settings-btn">
               📥 Download Your Data
             </button>
-            <button className="w-full px-4 py-2.5 bg-dark-700 hover:bg-dark-600 text-slate-300 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2">
+            <button className="w-full px-4 py-2.5 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2 settings-btn">
               🔒 Deactivate Account
             </button>
             <button className="w-full px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl transition-colors text-sm text-left font-medium flex items-center gap-2">

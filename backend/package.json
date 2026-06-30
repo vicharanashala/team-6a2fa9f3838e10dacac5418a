@@ -21,8 +21,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.0",
     "morgan": "^1.11.0",
-    "natural": "^6.12.0",
-    "node-cron": "^3.0.3",
+    "natural": "^8.1.1",
+    "node-cron": "^4.5.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {

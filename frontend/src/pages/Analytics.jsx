@@ -24,6 +24,13 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 function StatCard({ icon: Icon, label, value, sub, color = 'blue', delay = 0 }) {
+  const colorMap = {
+    blue:    { bg: 'bg-blue-500/15 border-blue-500/20',    text: 'text-blue-400'    },
+    amber:   { bg: 'bg-amber-500/15 border-amber-500/20',  text: 'text-amber-400'   },
+    emerald: { bg: 'bg-emerald-500/15 border-emerald-500/20', text: 'text-emerald-400' },
+    violet:  { bg: 'bg-violet-500/15 border-violet-500/20', text: 'text-violet-400'  },
+  }
+  const c = colorMap[color] || colorMap.blue
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
       className="card-dark p-5">
@@ -31,10 +38,10 @@ function StatCard({ icon: Icon, label, value, sub, color = 'blue', delay = 0 }) 
         <div>
           <p className="text-sm text-slate-500 mb-1">{label}</p>
           <p className="text-3xl font-bold text-white">{value}</p>
-          {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
+          {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
         </div>
-        <div className={`w-10 h-10 rounded-xl bg-${color}-500/15 border border-${color}-500/20 flex items-center justify-center`}>
-          <Icon size={20} className={`text-${color}-400`} />
+        <div className={`w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center`}>
+          <Icon size={20} className={c.text} />
         </div>
       </div>
     </motion.div>

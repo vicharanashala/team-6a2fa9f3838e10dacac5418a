@@ -19,6 +19,12 @@
     @apply bg-slate-50 text-slate-900;
     background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(0,0,0,0.04)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
   }
+  body:not(.dark) ::-webkit-scrollbar-track { background: #f1f5f9; }
+  body:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+  body:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+  body:not(.dark) ::selection { background: rgba(59,130,246,0.2); color: inherit; }
+  body:not(.dark) .glass { @apply bg-white/80 border-slate-200/60; }
+  body:not(.dark) .noise-overlay::before { opacity: 0.02; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
@@ -65,8 +71,95 @@
     @apply bg-rose-100 text-rose-700 border border-rose-200;
   }
 
+  .admin-table-header {
+    @apply bg-dark-700/80 border-b border-dark-500/50;
+  }
+  body:not(.dark) .admin-table-header {
+    @apply bg-slate-100 border-b border-slate-200;
+  }
+  body:not(.dark) .admin-table-row {
+    @apply hover:bg-slate-100 border-b border-slate-100;
+  }
+  body:not(.dark) .admin-table-row td {
+    @apply text-slate-700;
+  }
+  body:not(.dark) .admin-stat-card {
+    @apply bg-white border-slate-200 shadow-sm;
+  }
+  body:not(.dark) .admin-stat-card:hover {
+    @apply border-blue-300 shadow-md;
+  }
+  body:not(.dark) .admin-filter-bar {
+    @apply bg-white border border-slate-200;
+  }
+  body:not(.dark) .admin-empty-state {
+    @apply bg-white border border-slate-200;
+  }
+  body:not(.dark) .admin-badge {
+    @apply bg-slate-100 text-slate-600 border-slate-200;
+  }
+  body:not(.dark) .admin-modal-overlay {
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+  }
+  body:not(.dark) .admin-pagination-info {
+    @apply text-slate-500;
+  }
+  body:not(.dark) .admin-stat-card {
+    @apply bg-white border-slate-200 shadow-sm;
+  }
+  body:not(.dark) .admin-stat-card:hover {
+    @apply border-blue-300 shadow-md;
+  }
+  /* Status badges - light mode */
+  body:not(.dark) .status-open { @apply bg-blue-50 text-blue-700 border-blue-200; }
+  body:not(.dark) .status-answered { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  body:not(.dark) .status-resolved { @apply bg-slate-100 text-slate-600 border-slate-200; }
+  body:not(.dark) .status-escalated { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  /* Light mode btn-secondary */
+  body:not(.dark) .btn-secondary {
+    @apply bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300;
+  }
+  body:not(.dark) .btn-ghost {
+    @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100;
+  }
+  body:not(.dark) .btn-ghost:hover { @apply bg-slate-100; }
+  body:not(.dark) .card-hover { @apply hover:border-blue-300 hover:bg-slate-50 hover:shadow-md; }
+  body:not(.dark) .admin-table-header { @apply bg-slate-100 border-b border-slate-200; }
+  body:not(.dark) .admin-table-header th { @apply text-slate-600; }
+  body:not(.dark) .admin-table tbody tr { @apply hover:bg-slate-50; }
+  body:not(.dark) .admin-table tbody tr td { @apply text-slate-700; }
+  /* Light mode skeletons */
+  body:not(.dark) .skeleton { @apply bg-slate-200; }
+  body:not(.dark) .skeleton-text { @apply bg-slate-200; }
+  /* Light mode step indicators */
+  body:not(.dark) .step-future { @apply bg-slate-200 text-slate-500; }
+  body:not(.dark) .step-active { @apply bg-blue-600 text-white; }
+  body:not(.dark) .step-done { @apply bg-emerald-600 text-white; }
+  /* Light mode priority badges */
+  body:not(.dark) .priority-urgent { @apply bg-rose-50 text-rose-700 border-rose-200; }
+  body:not(.dark) .priority-important { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  body:not(.dark) .priority-general { @apply bg-blue-50 text-blue-700 border-blue-200; }
+  /* Light mode importance badges */
+  body:not(.dark) .importance-critical { @apply bg-rose-50 text-rose-700 border-rose-200; }
+  body:not(.dark) .importance-high { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  body:not(.dark) .importance-medium { @apply bg-blue-50 text-blue-700 border-blue-200; }
+  body:not(.dark) .importance-low { @apply bg-slate-100 text-slate-600 border-slate-200; }
   .card-hover {
-    @apply transition-all duration-200 hover:border-blue-500/30 hover:bg-dark-600/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5;
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg;
+  }
+  .card-hover {
+    @apply hover:border-blue-500/30 hover:bg-dark-600/50 hover:shadow-blue-500/5;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+  body:not(.dark) .card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  }
+  body:not(.dark) .card-hover {
+    @apply hover:border-blue-300 hover:bg-slate-50;
+  }
+  body:not(.dark) .card-hover {
+    @apply hover:border-blue-300 hover:bg-slate-50;
   }
   .btn-primary {
     @apply bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
@@ -121,4 +214,15 @@
   border-radius: 4px;
   height: 4px;
   transition: width 1s ease;
+}
+
+/* ===== Settings Page Light Mode ===== */
+body:not(.dark) .settings-option-card {
+  @apply bg-slate-50 border-slate-200;
+}
+body:not(.dark) .settings-option-card:hover {
+  @apply bg-slate-100 border-blue-300;
+}
+body:not(.dark) .settings-btn {
+  @apply bg-slate-100 hover:bg-slate-200 text-slate-700;
 }
