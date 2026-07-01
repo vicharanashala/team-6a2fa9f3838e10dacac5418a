@@ -35,16 +35,16 @@ announcementRouter.get('/admin/all', protect, restrictTo('admin'), async (req, r
 // GET /api/announcements/admin/stats - Announcement statistics (admin only)
 announcementRouter.get('/admin/stats', protect, restrictTo('admin'), async (req, res) => {
   try {
-    const [total, highPriority, mediumPriority, lowPriority, pinned] = await Promise.all([
+    const [total, urgentCount, importantCount, generalCount, pinnedCount] = await Promise.all([
       Announcement.countDocuments({}),
-      Announcement.countDocuments({ priority: 'high', isActive: true }),
-      Announcement.countDocuments({ priority: 'medium', isActive: true }),
-      Announcement.countDocuments({ priority: 'low', isActive: true }),
+      Announcement.countDocuments({ priority: 'urgent', isActive: true }),
+      Announcement.countDocuments({ priority: 'important', isActive: true }),
+      Announcement.countDocuments({ priority: 'general', isActive: true }),
       Announcement.countDocuments({ isPinned: true, isActive: true })
     ]);
     const recentAnnouncements = await Announcement.find({ isActive: true })
       .sort({ createdAt: -1 }).limit(5).populate('author', 'name').lean();
-    res.json({ total, byPriority: { high: highPriority, medium: mediumPriority, low: lowPriority }, pinned, recentAnnouncements });
+    res.json({ total, byPriority: { urgent: urgentCount, important: importantCount, general: generalCount }, pinnedCount, recentAnnouncements });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch announcement stats.' });
   }

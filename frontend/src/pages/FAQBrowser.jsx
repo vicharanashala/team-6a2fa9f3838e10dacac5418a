@@ -1,7 +1,7 @@
 // FAQBrowser.jsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpen, Search, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import { BookOpen, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import api from '../utils/api'
 
@@ -125,6 +125,14 @@ export function FAQBrowser() {
   const [recentFAQs, setRecentFAQs] = useState([])
   
 
+  // Live search debounce
+  const searchTimerRef = useRef(null)
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => fetchFAQs(search), 300)
+    return () => clearTimeout(searchTimerRef.current)
+  }, [search])
+
   useEffect(() => {
   fetchFAQs(search)
 
@@ -179,9 +187,8 @@ export function FAQBrowser() {
       </div>
 
       <form onSubmit={handleSearch} className="relative mb-5">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search FAQs..." className="input-dark pl-11 pr-20 text-sm" />
+<input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search FAQs..." className="input-dark pr-20 text-sm" />
         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-3 text-sm">Search</button>
       </form>
 

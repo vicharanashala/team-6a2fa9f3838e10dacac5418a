@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Brain, TrendingUp, Flame, Search, ArrowRight, Sparkles, AlertCircle,
+import { Brain, TrendingUp, Flame, ArrowRight, Sparkles, AlertCircle,
          BookOpen, Users, Shield, Zap, ChevronRight, MessageSquarePlus, Image as ImageIcon } from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
@@ -87,10 +87,9 @@ export default function Home() {
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder='Ask anything — "NOC deadline", "videos repeating", "offer letter format"...'
-              className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl border-slate-300 focus:border-blue-500/60" />
+              className="input-dark pr-32 py-4 text-base rounded-2xl border-slate-300 focus:border-blue-500/60" />
             <button type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-2 px-4 text-sm flex items-center gap-1.5">
               Ask AI <Brain size={14} />

@@ -391,9 +391,36 @@ export default function AskAI() {
           <textarea ref={textRef} value={question}
             onChange={e => setQuestion(e.target.value)} onKeyDown={handleKeyDown}
             placeholder="Ask about NOC, ViBe issues, Rosetta, team formation, offer letter... (Ctrl+Enter to send)"
-            className="input-dark min-h-[100px] resize-none pr-14 text-base" rows={3} />
+            className="input-dark min-h-[100px] resize-none pr-36 text-base" rows={3} />
+
+          {/* Voice Input Button */}
+          <button
+            onClick={toggleListening}
+            title={isListening ? 'Stop listening' : 'Voice input'}
+            className={`absolute bottom-3 right-[92px] w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+              isListening
+                ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/25 animate-pulse'
+                : 'bg-slate-700 hover:bg-slate-600 text-slate-300 dark:bg-dark-600 dark:hover:bg-dark-500'
+            }`}>
+            {isListening ? <MicOff size={16} className="text-white" /> : <Mic size={16} className="text-slate-300" />}
+          </button>
+
+          {/* TTS Button */}
+          <button
+            onClick={toggleTTS}
+            disabled={!result?.answer}
+            title={isPlayingTTS ? 'Stop reading aloud' : 'Read answer aloud'}
+            className={`absolute bottom-3 right-[56px] w-9 h-9 rounded-lg flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              isPlayingTTS
+                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                : 'bg-slate-700 hover:bg-slate-600 text-slate-300 dark:bg-dark-600 dark:hover:bg-dark-500'
+            }`}>
+            {isPlayingTTS ? <Volume2 size={16} className="text-white" /> : <VolumeX size={16} className="text-slate-300" />}
+          </button>
+
+          {/* Send Button */}
           <button onClick={() => handleAsk()} disabled={loading || !question.trim()}
-            className="absolute bottom-3 right-3 w-9 h-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all hover:shadow-lg hover:shadow-blue-500/25">
+            className="absolute bottom-3 right-[20px] w-9 h-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all hover:shadow-lg hover:shadow-blue-500/25">
             <Send size={16} className="text-white" />
           </button>
         </div>
@@ -432,12 +459,12 @@ export default function AskAI() {
                   </div>
                   <div>
                     <div className="text-sm font-medium dark:text-white text-slate-900">VINS AI</div>
-                    <div className="text-xs text-slate-500">Grounded in FAQ knowledge base</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-500">Grounded in FAQ knowledge base</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <ConfidenceBadge level={result.confidence} score={result.confidenceScore} />
-                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-dark-600 transition-colors">
+                  <button onClick={copyAnswer} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-dark-600 transition-colors copy-btn">
                     <Copy size={14} />
                   </button>
                 </div>
@@ -458,8 +485,8 @@ export default function AskAI() {
 
               {/* Answer */}
               <div className="p-5">
-                <div className="prose prose-invert prose-sm max-w-none">
-                  <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                <div className="prose dark:prose-invert prose-sm max-w-none">
+                  <p className="leading-relaxed whitespace-pre-wrap dark:text-slate-200 text-slate-800">{result.answer}</p>
                 </div>
               </div>
 
@@ -478,7 +505,7 @@ export default function AskAI() {
               {result.sourceSections?.length > 0 && (
                 <div className="px-5 pb-3">
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs text-slate-500">Sources:</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-500">Sources:</span>
                     {result.sourceSections.map((s, i) => (
                       <span key={i} className="ai-chip text-xs font-mono px-2 py-0.5 rounded border">{s}</span>
                     ))}

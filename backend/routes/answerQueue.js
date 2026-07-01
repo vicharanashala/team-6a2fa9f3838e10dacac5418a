@@ -7,7 +7,7 @@ const { Analytics } = require('../models/Analytics');
 
 const router = express.Router();
 
-const LOCK_DURATION_MS = 3 * 60 * 60 * 1000; // 3 hours
+const LOCK_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 const STALL_THRESHOLD = 2; // skips before a question is marked stalled
 
 // Release any lock on `query` whose lockExpiresAt has passed.
@@ -53,6 +53,22 @@ router.get('/me/stats', protect, restrictTo('mentor', 'admin'), async (req, res)
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch your stats.' });
+  }
+});
+
+// GET /api/answer-queue/:questionId
+// Fetches a locked question if it belongs to the current user.
+router.get('/:questionId', protect, restrictTo('mentor', 'admin'), async (req, res) => {
+  try {
+    const query = await Query.findOne({
+      _id: req.params.questionId,
+      lockedBy: req.user._id,
+      lockExpiresAt: { $gt: new Date() },
+    });
+    if (!query) return res.status(404).json({ error: 'Lock not found or expired.' });
+    res.json({ question: query });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch question.' });
   }
 });
 

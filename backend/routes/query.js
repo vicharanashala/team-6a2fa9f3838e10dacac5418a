@@ -1,8 +1,18 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Query = require('../models/Query');
 const User = require('../models/User');
 const FAQ = require('../models/FAQ');
 const { protect, optionalAuth, restrictTo } = require('../middleware/auth');
+
+// Serialize lean() docs so ObjectId fields become strings, not { _bsontype: 'ObjectId', id: <Buffer> }
+function serialize(doc) {
+  if (!doc) return doc;
+  if (Array.isArray(doc)) return doc.map(serialize);
+  return JSON.parse(JSON.stringify(doc, (k, v) =>
+    v instanceof mongoose.Types.ObjectId ? v.toString() : v
+  ));
+}
 const { processRAGQuery } = require('../utils/ragService');
 const { Analytics } = require('../models/Analytics');
 
@@ -28,7 +38,7 @@ router.get('/', optionalAuth, async (req, res) => {
       .limit(parseInt(limit))
       .lean();
 
-    res.json({ queries, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+    res.json({ queries: serialize(queries), total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch queries.' });
   }
@@ -41,7 +51,7 @@ router.get('/trending', async (req, res) => {
       .populate('author', 'name avatar')
       .sort({ views: -1, createdAt: -1 })
       .limit(5).lean();
-    res.json(queries);
+    res.json(serialize(queries));
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch trending.' });
   }
@@ -60,7 +70,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     await Query.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
 
     await Analytics.create({ type: 'page_view', queryId: query._id, userId: req.user?._id, category: query.category });
-    res.json(query);
+    res.json(serialize(query));
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch query.' });
   }
@@ -128,7 +138,7 @@ router.post('/', protect, async (req, res) => {
     // Log analytics
     await Analytics.create({ type: 'query', category, userId: req.user._id, queryId: query._id });
 
-    const populated = await Query.findById(query._id).populate('author', 'name role avatar').lean();
+    const populated = serialize(await Query.findById(query._id).populate('author', 'name role avatar').lean());
     res.status(201).json(populated);
   } catch (err) {
     console.error(err);
@@ -183,7 +193,7 @@ router.post('/:id/answers', protect, async (req, res) => {
 
     const updated = await Query.findById(req.params.id)
       .populate('answers.author', 'name role avatar phase').lean();
-    res.json(updated);
+    res.json(serialize(updated));
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -231,7 +241,7 @@ router.get('/bookmarked', protect, async (req, res) => {
       .populate('author', 'name college phase')
       .sort({ createdAt: -1 })
       .lean();
-    res.json({ queries });
+    res.json({ queries: serialize(queries) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch bookmarked queries.' });
   }
@@ -332,7 +342,7 @@ router.get('/admin/all', protect, restrictTo('admin'), async (req, res) => {
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .lean();
-    res.json({ queries, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+    res.json({ queries: serialize(queries), total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch queries.' });
   }
@@ -351,7 +361,7 @@ router.get('/admin/escalated', protect, restrictTo('admin'), async (req, res) =>
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .lean();
-    res.json({ queries, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+    res.json({ queries: serialize(queries), total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch escalated queries.' });
   }
@@ -366,7 +376,7 @@ router.patch('/admin/escalated/:id/resolve', protect, restrictTo('admin'), async
       resolvedAt: new Date()
     }, { new: true }).populate('author', 'name role avatar').lean();
     if (!query) return res.status(404).json({ error: 'Query not found.' });
-    res.json({ message: 'Escalated query resolved.', query });
+    res.json({ message: 'Escalated query resolved.', query: serialize(query) });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -388,7 +398,7 @@ router.patch('/admin/escalated/:id/assign', protect, restrictTo('admin'), async 
       status: 'open'
     }, { new: true }).populate('author', 'name role avatar').populate('assignedMentor', 'name email').lean();
     if (!query) return res.status(404).json({ error: 'Query not found.' });
-    res.json({ message: 'Mentor assigned.', query });
+    res.json({ message: 'Mentor assigned.', query: serialize(query) });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -411,7 +421,7 @@ router.get('/admin/escalation-stats', protect, restrictTo('admin'), async (req, 
       total: totalEscalated,
       resolved,
       unassigned,
-      recentEscalations
+      recentEscalations: serialize(recentEscalations)
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch escalation stats.' });

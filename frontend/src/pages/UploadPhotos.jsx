@@ -34,7 +34,7 @@ function SourceCard({ section, category, question, similarity }) {
         </div>
         <div className="flex-1 min-w-0">
           {section && <span className="text-xs font-mono text-blue-400 mr-2">§{section}</span>}
-          <span className="text-sm text-slate-300 truncate">{question?.substring(0, 60)}...</span>
+          <span className="text-sm dark:text-slate-300 text-slate-700 truncate">{question?.substring(0, 60)}...</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-600">{similarity?.toFixed(0)}% match</span>
@@ -46,7 +46,7 @@ function SourceCard({ section, category, question, similarity }) {
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
             className="overflow-hidden border-t border-dark-500/50">
             <div className="px-4 py-3">
-              <p className="text-sm font-medium text-slate-300 mb-1">{question}</p>
+              <p className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-1">{question}</p>
               <span className="badge-category">{category}</span>
             </div>
           </motion.div>
@@ -171,7 +171,7 @@ export default function UploadPhotos() {
         {/* Upload Column */}
         <div className="space-y-4">
           <div className="card-dark p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-3">1. Upload Screenshot / Photo</h2>
+            <h2 className="text-sm font-semibold dark:text-slate-300 text-slate-700 mb-3">1. Upload Screenshot / Photo</h2>
             
             {!image ? (
               <div
@@ -186,7 +186,7 @@ export default function UploadPhotos() {
                 }`}
               >
                 <UploadCloud size={32} className="text-slate-500 mb-3" />
-                <p className="text-sm text-slate-300 font-medium mb-1">Drag & drop your screenshot here</p>
+                <p className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-1">Drag & drop your screenshot here</p>
                 <p className="text-xs text-slate-500">or click to browse from files</p>
                 <p className="text-[10px] text-slate-600 mt-4">Supports PNG, JPG, JPEG (Max 4MB)</p>
                 <input
@@ -216,7 +216,7 @@ export default function UploadPhotos() {
           </div>
 
           <div className="card-dark p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-2">2. Describe the Issue (Optional)</h2>
+            <h2 className="text-sm font-semibold dark:text-slate-300 text-slate-700 mb-2">2. Describe the Issue (Optional)</h2>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -303,7 +303,7 @@ export default function UploadPhotos() {
 
                   {/* Answer */}
                   <div className="p-5">
-                    <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap dark:text-slate-200 text-slate-800">{result.answer}</p>
                   </div>
 
                   {/* Warning */}
@@ -351,7 +351,7 @@ export default function UploadPhotos() {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       {result.followUpSuggestions.map((q, i) => (
-                        <div key={i} className="text-xs bg-dark-700 border border-dark-500/50 text-slate-300 p-2.5 rounded-xl flex items-center justify-between">
+                        <div key={i} className="text-xs bg-dark-700 border border-dark-500/50 dark:text-slate-300 text-slate-700 p-2.5 rounded-xl flex items-center justify-between">
                           <span>{q}</span>
                         </div>
                       ))}

@@ -65,6 +65,8 @@ const userSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
   }],
   bookmarkedQueries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Query' }],
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorSecret: { type: String, select: false },
   isActive: { type: Boolean, default: true },
   lastSeen: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }

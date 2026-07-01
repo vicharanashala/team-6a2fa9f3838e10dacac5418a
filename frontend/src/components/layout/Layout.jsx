@@ -57,17 +57,23 @@ export default function Layout() {
         const allIds = announcements.map(a => a._id)
         if (allIds.length > 0) {
           setLocalReadIds(prev => new Set([...prev, ...allIds]))
+          allIds.forEach(id => api.patch(`/announcements/${id}/read`).catch(() => {}))
         }
       }
       return !o
     })
   }
 
-  const isAnnRead = (ann) => ann.isRead || localReadIds.has(ann._id)
+  const isAnnRead = (ann) => {
+    if (localReadIds.has(ann._id)) return true
+    const readBy = ann.readBy || []
+    return readBy.some(id => id.toString() === user?._id?.toString())
+  }
 
-  // Mark a single announcement as read
+  // Mark a single announcement as read (persist to backend)
   const onReadAnnouncement = (id) => {
     setLocalReadIds(prev => new Set([...prev, id]))
+    api.patch(`/announcements/${id}/read`).catch(() => {})
   }
 
   // --- Notification item renderer ---
@@ -245,14 +251,6 @@ export default function Layout() {
 
           <div className="flex-1" />
 
-          <button onClick={() => navigate('/announcements')}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-dark-600 transition-colors relative"
-            title="Announcements">
-            <Bell size={18} />
-            {/* Optional dot indicator for unread announcements */}
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-          </button>
-
           {/* Theme toggle */}
           <button onClick={toggleTheme} aria-label="Toggle theme"
             className="p-2 rounded-lg dark:text-slate-400 text-slate-500 dark:hover:text-slate-200 hover:text-slate-900 dark:hover:bg-dark-600 hover:bg-slate-100 transition-colors">
@@ -269,7 +267,7 @@ export default function Layout() {
               >
                 <Bell size={18} />
               </motion.div>
-              {badgeLabel && (
+              {badgeLabel && user?.preferences?.notifications !== false && (
                 <motion.span key={badgeLabel} initial={{ scale: 0.4, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-white dark:ring-dark-800">
@@ -280,7 +278,7 @@ export default function Layout() {
 
             {/* Notification Dropdown */}
             <AnimatePresence>
-              {notifOpen && (
+              {notifOpen && user?.preferences?.notifications !== false && (
                 <motion.div initial={{ opacity: 0, y: 6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.97 }}
                   transition={{ duration: 0.12, ease: 'easeOut' }}

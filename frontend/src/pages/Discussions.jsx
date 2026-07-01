@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { MessagesSquare, Search, Filter, Plus, Eye, MessageSquare, TrendingUp,
+import { MessagesSquare, Filter, Plus, Eye, MessageSquare, TrendingUp,
          Clock, CheckCircle, AlertTriangle, Bookmark, ChevronDown, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '../utils/api'
@@ -155,6 +155,17 @@ export default function Discussions() {
     fetchQueries()
   }, [category, status, sort, page])
 
+  // Debounced live search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (search) {
+        setPage(1)
+        fetchQueries()
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
+
   const fetchQueries = async () => {
     setLoading(true)
     try {
@@ -202,10 +213,9 @@ export default function Discussions() {
 
       {/* Search */}
       <form onSubmit={handleSearch} className="relative mb-5">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
-        <input value={search} onChange={e => setSearch(e.target.value)}
+<input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search discussions..."
-          className="input-dark pl-11 pr-24" />
+          className="input-dark pr-24" />
         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-3 text-sm">
           Search
         </button>

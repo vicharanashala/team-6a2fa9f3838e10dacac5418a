@@ -81,6 +81,95 @@ router.patch('/change-password', protect, async (req, res) => {
   }
 });
 
+router.patch('/deactivate', protect, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user._id, { isActive: false });
+    res.json({ message: 'Account deactivated.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to deactivate account.' });
+  }
+});
+
+// GET /api/users/download-data
+router.get('/download-data', protect, async (req, res) => {
+  try {
+    const [user, queries] = await Promise.all([
+      User.findById(req.user._id).select('-password').lean(),
+      Query.find({ author: req.user._id }).sort({ createdAt: -1 }).lean()
+    ]);
+    const exportData = {
+      profile: user,
+      queries,
+      exportedAt: new Date().toISOString()
+    };
+    res.setHeader('Content-Disposition', `attachment; filename="vins-data-${Date.now()}.json"`);
+    res.setHeader('Content-Type', 'application/json');
+    res.json(exportData);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to export data.' });
+  }
+});
+
+// POST /api/users/2fa/setup
+router.post('/2fa/setup', protect, async (req, res) => {
+  try {
+    const speakeasy = require('speakeasy');
+    const secret = speakeasy.generateSecret({ name: `VINS AI (${req.user.email})`, length: 20 });
+    req.user.twoFactorSecret = secret.base32;
+    await req.user.save();
+    res.json({
+      secret: secret.base32,
+      otpauthUrl: secret.otpauth_url,
+      provisioningUri: secret.otpauth_url
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to set up 2FA.' });
+  }
+});
+
+// POST /api/users/2fa/verify
+router.post('/2fa/verify', protect, async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'Token is required' });
+    const speakeasy = require('speakeasy');
+    const verified = speakeasy.totp.verify({
+      secret: req.user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 1
+    });
+    if (!verified) return res.status(400).json({ error: 'Invalid token' });
+    req.user.twoFactorEnabled = true;
+    await req.user.save();
+    res.json({ message: '2FA enabled successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to verify 2FA token.' });
+  }
+});
+
+// POST /api/users/2fa/disable
+router.post('/2fa/disable', protect, async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'Token is required' });
+    const speakeasy = require('speakeasy');
+    const verified = speakeasy.totp.verify({
+      secret: req.user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 1
+    });
+    if (!verified) return res.status(400).json({ error: 'Invalid token' });
+    req.user.twoFactorEnabled = false;
+    req.user.twoFactorSecret = undefined;
+    await req.user.save();
+    res.json({ message: '2FA disabled successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to disable 2FA.' });
+  }
+});
+
 router.delete('/withdraw', protect, async (req, res) => {
   try {
     await User.findByIdAndDelete(req.user._id);

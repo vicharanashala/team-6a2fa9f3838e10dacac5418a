@@ -125,7 +125,7 @@ export default function AdminAnnouncements() {
         api.get('/announcements/admin/all').catch(() => ({ data: [] })),
       ])
       setAnnouncements(pubRes.data)
-      setAllAnnouncements(allRes.data)
+      setAllAnnouncements(allRes.data.announcements || allRes.data || [])
       // fetch stats
       api.get('/announcements/admin/stats').then(r => setStats(r.data)).catch(() => {})
     } catch (e) {}

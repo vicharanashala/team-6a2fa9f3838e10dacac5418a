@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Users, Search, Shield, UserCheck, UserX, ChevronDown, ChevronUp,
+import { Users, Shield, UserCheck, UserX, ChevronDown, ChevronUp,
          Trash2, X, Check, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
@@ -125,6 +125,14 @@ export default function AdminUsers() {
   const [expandedUserId, setExpandedUserId] = useState(null)
   const limit = 15
 
+  // Live search debounce
+  const searchTimerRef = useRef(null)
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => fetchUsers(), 300)
+    return () => clearTimeout(searchTimerRef.current)
+  }, [search])
+
   useEffect(() => { fetchUsers() }, [roleFilter, statusFilter, page])
 
   const fetchUsers = async () => {
@@ -193,9 +201,8 @@ export default function AdminUsers() {
         className="card-dark p-4">
         <form onSubmit={handleSearch} className="flex gap-3 mb-4">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email..."
-              className="input-dark pl-9 text-sm" />
+              className="input-dark text-sm" />
           </div>
           <button type="submit" className="btn-primary py-2 px-4 text-sm">Search</button>
         </form>

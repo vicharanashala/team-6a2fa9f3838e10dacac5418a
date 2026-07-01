@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Inbox, Clock, Lock, Search, PlusCircle, Send, ArrowLeft, X,
@@ -7,7 +8,7 @@ import {
 import api from '../utils/api'
 import toast from 'react-hot-toast'
 
-const LOCK_SECONDS = 3 * 60 * 60
+const LOCK_SECONDS = 5 * 60
 
 function formatTime(secs) {
   const h = Math.floor(secs / 3600)
@@ -53,7 +54,7 @@ function QuestionCard({ question }) {
           {getInitials(question.askerName)}
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-200">{question.askerName}</p>
+          <p className="text-sm font-medium dark:text-slate-200 text-slate-800">{question.askerName}</p>
           <p className="text-xs text-slate-600">
             {question.stepLabel} · {new Date(question.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
           </p>
@@ -62,7 +63,7 @@ function QuestionCard({ question }) {
           <Lock size={10} /> locked by you
         </span>
       </div>
-      <p className="text-slate-200 text-sm leading-relaxed mb-3">{question.text}</p>
+      <p className="text-sm leading-relaxed mb-3 dark:text-slate-200 text-slate-800">{question.text}</p>
       {question.images && question.images.length > 0 && (
         <div className="flex flex-wrap gap-3 mb-3">
           {question.images.map((img, idx) => (
@@ -93,7 +94,7 @@ function TypeSelect({ onSelect }) {
             <Search size={16} />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-200 mb-0.5">Find FAQ</p>
+            <p className="text-sm font-medium dark:text-slate-200 text-slate-800 mb-0.5">Find FAQ</p>
             <p className="text-xs text-slate-500 leading-relaxed">An existing FAQ entry already covers this. Point the asker to it.</p>
           </div>
         </button>
@@ -103,7 +104,7 @@ function TypeSelect({ onSelect }) {
             <PlusCircle size={16} />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-200 mb-0.5">Create FAQ</p>
+            <p className="text-sm font-medium dark:text-slate-200 text-slate-800 mb-0.5">Create FAQ</p>
             <p className="text-xs text-slate-500 leading-relaxed">No entry covers this yet. Propose one — it'll go to admin review.</p>
           </div>
         </button>
@@ -169,7 +170,7 @@ function FindFAQ({ onSubmit, submitting }) {
           {filtered.map(f => (
             <button key={f._id} onClick={() => setSelectedId(f._id)}
               className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all ${
-                selectedId === f._id ? 'border-blue-500/40 bg-blue-500/10 text-slate-100' : 'border-dark-500/50 bg-dark-700 text-slate-300 hover:border-dark-400'
+                selectedId === f._id ? 'border-blue-500/40 bg-blue-500/10 text-slate-100' : 'border-dark-500/50 bg-dark-700 dark:text-slate-300 text-slate-700 hover:border-dark-400'
               }`}>
               <div className={`w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center ${selectedId === f._id ? 'border-blue-400' : 'border-dark-400'}`}>
                 {selectedId === f._id && <div className="w-2 h-2 rounded-full bg-blue-400" />}
@@ -186,7 +187,7 @@ function FindFAQ({ onSubmit, submitting }) {
           <p className="text-xs font-medium text-blue-400 mb-1 flex items-center gap-1.5">
             <BookOpen size={11} /> {selected.category}{selected.sectionId && ` — §${selected.sectionId}`}
           </p>
-          <p className="text-sm text-slate-300 leading-relaxed">{selected.answer}</p>
+          <p className="text-sm leading-relaxed dark:text-slate-300 text-slate-700">{selected.answer}</p>
         </div>
       )}
 
@@ -241,7 +242,7 @@ function SuccessScreen({ result, onPullAnother }) {
       <div className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto mb-4">
         <CheckCircle2 size={26} />
       </div>
-      <h2 className="text-lg font-semibold text-white mb-2">
+      <h2 className="text-lg font-semibold dark:text-white text-slate-900 mb-2">
         {isFind ? 'Answer submitted' : 'Proposal sent to admin'}
       </h2>
       <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">
@@ -259,6 +260,7 @@ function SuccessScreen({ result, onPullAnother }) {
 // ── Main page ────────────────────────────────────────────────────────────
 export default function AnswerQueue() {
   const [view, setView] = useState('idle') // idle | claimed | submitted | expired
+  const [lockedExpiry, setLockedExpiry] = useState(null)
   const [queueStats, setQueueStats] = useState({ open: 0, stalled: 0, answeredToday: 0 })
   const [myStats, setMyStats] = useState({ points: 0, given: 0, accepted: 0 })
   const [question, setQuestion] = useState(null)
@@ -268,6 +270,7 @@ export default function AnswerQueue() {
   const [submitting, setSubmitting] = useState(false)
   const [secsLeft, setSecsLeft] = useState(LOCK_SECONDS)
   const timerRef = useRef(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchStats()
@@ -287,8 +290,10 @@ export default function AnswerQueue() {
 
   const startTimer = (expiresAt) => {
     clearInterval(timerRef.current)
+    // Enforce local 5-minute cap regardless of backend lock duration
+    const cappedAt = Math.min(new Date(expiresAt).getTime(), Date.now() + LOCK_SECONDS * 1000)
     timerRef.current = setInterval(() => {
-      const remaining = Math.max(0, Math.floor((new Date(expiresAt) - Date.now()) / 1000))
+      const remaining = Math.max(0, Math.floor((cappedAt - Date.now()) / 1000))
       setSecsLeft(remaining)
       if (remaining <= 0) {
         clearInterval(timerRef.current)
@@ -302,11 +307,29 @@ export default function AnswerQueue() {
     try {
       const res = await api.post('/answer-queue/pull')
       setQuestion(res.data.question)
-      setSecsLeft(Math.floor((new Date(res.data.expiresAt) - Date.now()) / 1000))
-      startTimer(res.data.expiresAt)
+      const expiry = new Date(res.data.expiresAt)
+      setLockedExpiry(expiry)
+      setSecsLeft(Math.floor((expiry - Date.now()) / 1000))
+      startTimer(expiry)
       setView('claimed')
     } catch (e) {
-      toast.error(e.response?.data?.error || 'Could not pull a question.')
+      if (e.response?.status === 409) {
+        const { questionId } = e.response.data
+        try {
+          const qRes = await api.get(`/answer-queue/${questionId}`)
+          const q = qRes.data.question
+          setQuestion(q)
+          const expiry = new Date(q.lockExpiresAt)
+          setLockedExpiry(expiry)
+          setSecsLeft(Math.floor((expiry - Date.now()) / 1000))
+          startTimer(expiry)
+          setView('claimed')
+        } catch {
+          toast.error('Could not resume locked question.')
+        }
+      } else {
+        toast.error(e.response?.data?.error || 'Could not pull a question.')
+      }
     }
     setPulling(false)
   }
@@ -354,32 +377,32 @@ export default function AnswerQueue() {
                 <Inbox size={20} className="text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">Answer a Question</h1>
+                <h1 className="text-xl font-bold dark:text-white text-slate-900">Answer a Question</h1>
                 <p className="text-sm text-slate-500">Pull from the queue · 3 hours to respond</p>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="card-dark p-4 text-center">
-                <p className="text-2xl font-bold text-white">{queueStats.open}</p>
+                <p className="text-2xl font-bold dark:text-white text-slate-900">{queueStats.open}</p>
                 <p className="text-xs text-slate-500 mt-0.5">open</p>
               </div>
               <div className="card-dark p-4 text-center">
-                <p className="text-2xl font-bold text-white">{queueStats.stalled}</p>
+                <p className="text-2xl font-bold dark:text-white text-slate-900">{queueStats.stalled}</p>
                 <p className="text-xs text-slate-500 mt-0.5">stalled</p>
               </div>
               <div className="card-dark p-4 text-center">
-                <p className="text-2xl font-bold text-white">{queueStats.answeredToday}</p>
+                <p className="text-2xl font-bold dark:text-white text-slate-900">{queueStats.answeredToday}</p>
                 <p className="text-xs text-slate-500 mt-0.5">answered today</p>
               </div>
             </div>
 
             <div className="card-dark p-4 mb-6 flex items-center gap-2.5">
               <Star size={16} className="text-amber-400 flex-shrink-0" />
-              <p className="text-sm text-slate-300">
-                <span className="font-semibold text-white">{myStats.points}</span> pts ·{' '}
-                <span className="font-semibold text-white">{myStats.given}</span> answers given ·{' '}
-                <span className="font-semibold text-white">{myStats.accepted}</span> accepted
+              <p className="text-sm dark:text-slate-300 text-slate-700">
+                <span className="font-semibold dark:text-white text-slate-900">{myStats.points}</span> pts ·{' '}
+                <span className="font-semibold dark:text-white text-slate-900">{myStats.given}</span> answers given ·{' '}
+                <span className="font-semibold dark:text-white text-slate-900">{myStats.accepted}</span> accepted
               </p>
             </div>
 
@@ -397,7 +420,7 @@ export default function AnswerQueue() {
           <motion.div key="claimed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-lg font-bold text-white">Answering this question</h1>
+                <h1 className="text-lg font-bold dark:text-white text-slate-900">Answering this question</h1>
                 <p className="text-sm text-slate-500">Claimed just now</p>
               </div>
               <TimerBar secsLeft={secsLeft} />
@@ -443,7 +466,7 @@ export default function AnswerQueue() {
             <div className="w-14 h-14 rounded-full bg-rose-500/15 text-rose-400 flex items-center justify-center mx-auto mb-4">
               <AlarmClockOff size={26} />
             </div>
-            <h2 className="text-lg font-semibold text-white mb-2">Time expired</h2>
+            <h2 className="text-lg font-semibold dark:text-white text-slate-900 mb-2">Time expired</h2>
             <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">
               This question has returned to the queue. Another intern can claim it.
             </p>

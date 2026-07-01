@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Search, Plus, Edit3, Trash2, ChevronDown, ChevronUp,
+import { BookOpen, Plus, Edit3, Trash2, ChevronDown, ChevronUp,
          Check, X, Star, ThumbsUp, ThumbsDown, ExternalLink } from 'lucide-react'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
@@ -161,7 +161,7 @@ function FAQRow({ faq, onEdit, onDelete }) {
                 <span className="badge-category text-xs">{faq.category}</span>
                 <span className={`text-xs border px-2 py-0.5 rounded-full capitalize ${impColors[faq.importance] || impColors.medium}`}>{faq.importance}</span>
               </div>
-              <p className="text-sm text-slate-200 line-clamp-1">{faq.question}</p>
+              <p className="text-sm dark:text-slate-200 text-slate-800 line-clamp-1">{faq.question}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <div className="flex items-center gap-3 text-xs text-slate-600">
@@ -223,6 +223,14 @@ export default function AdminFAQs() {
   const [stats, setStats] = useState(null)
   const limit = 20
 
+  // Live search debounce
+  const searchTimerRef = useRef(null)
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => fetchFAQs(), 300)
+    return () => clearTimeout(searchTimerRef.current)
+  }, [search])
+
   useEffect(() => { fetchFAQs() }, [category, importance, page])
 
   const fetchFAQs = async () => {
@@ -282,9 +290,8 @@ export default function AdminFAQs() {
         className="card-dark p-4 space-y-3">
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search FAQs..."
-              className="input-dark pl-9 text-sm" />
+              className="input-dark text-sm" />
           </div>
           <button type="submit" className="btn-primary py-2 px-4 text-sm">Search</button>
         </form>
