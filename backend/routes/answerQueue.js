@@ -2,7 +2,7 @@ const express = require('express');
 const Query = require('../models/Query');
 const FAQ = require('../models/FAQ');
 const User = require('../models/User');
-const { protect } = require('../middleware/auth');
+const { protect, restrictTo } = require('../middleware/auth');
 const { Analytics } = require('../models/Analytics');
 
 const router = express.Router();
@@ -24,7 +24,7 @@ async function releaseIfExpired(query) {
 
 // GET /api/answer-queue/stats
 // Counts for the idle screen: open, stalled, answered today.
-router.get('/stats', protect, async (req, res) => {
+router.get('/stats', protect, restrictTo('mentor', 'admin'), async (req, res) => {
   try {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
@@ -43,7 +43,7 @@ router.get('/stats', protect, async (req, res) => {
 
 // GET /api/answer-queue/me/stats
 // The logged-in answerer's own running totals.
-router.get('/me/stats', protect, async (req, res) => {
+router.get('/me/stats', protect, restrictTo('mentor', 'admin'), async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('stats');
     res.json({
@@ -58,7 +58,7 @@ router.get('/me/stats', protect, async (req, res) => {
 
 // POST /api/answer-queue/pull
 // Atomically claims one open, unlocked question for the current user.
-router.post('/pull', protect, async (req, res) => {
+router.post('/pull', protect, restrictTo('mentor', 'admin'), async (req, res) => {
   try {
     // one active lock per answerer at a time
     const alreadyLocked = await Query.findOne({
@@ -127,7 +127,7 @@ router.post('/pull', protect, async (req, res) => {
 
 // POST /api/answer-queue/:id/skip
 // Returns a locked question to the queue without answering it.
-router.post('/:id/skip', protect, async (req, res) => {
+router.post('/:id/skip', protect, restrictTo('mentor', 'admin'), async (req, res) => {
   try {
     const query = await Query.findById(req.params.id);
     if (!query) return res.status(404).json({ error: 'Question not found.' });
@@ -150,7 +150,7 @@ router.post('/:id/skip', protect, async (req, res) => {
 
 // POST /api/answer-queue/:id/answer
 // Submits either a "find" (point to existing FAQ) or "create" (propose new FAQ) answer.
-router.post('/:id/answer', protect, async (req, res) => {
+router.post('/:id/answer', protect, restrictTo('mentor', 'admin'), async (req, res) => {
   try {
     const { type, faqId, proposedQuestion, proposedAnswer } = req.body;
     const query = await Query.findById(req.params.id);

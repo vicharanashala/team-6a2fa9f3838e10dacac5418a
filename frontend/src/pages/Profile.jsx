@@ -1,21 +1,35 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { Star, Clock, ExternalLink } from 'lucide-react';
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ name: '', college: '', batch: '' });
   const [stats, setStats] = useState({ queriesRaised: 0, answersGiven: 0, bookmarks: 0, reputation: 0 });
+  const [bookmarkedQueries, setBookmarkedQueries] = useState([]);
 
   useEffect(() => {
     if (user) {
       setFormData({ name: user.name || '', college: user.college || '', batch: user.batch || '' });
       setStats(user.stats || {});
     }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const res = await api.get('/queries/bookmarked');
+        setBookmarkedQueries(res.data.queries || []);
+      } catch { /* silent */ }
+    };
+    if (user) fetchBookmarks();
   }, [user]);
 
   const handleSaveProfile = async () => {
@@ -157,6 +171,48 @@ export default function Profile() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Bookmarked Queries */}
+        <div className="card-dark p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-5">
+            <Star size={16} className="text-amber-400" />
+            <h2 className="text-lg font-semibold dark:text-white text-slate-900">Bookmarked Queries</h2>
+            {bookmarkedQueries.length > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20 font-medium">
+                {bookmarkedQueries.length}
+              </span>
+            )}
+          </div>
+          {bookmarkedQueries.length === 0 ? (
+            <div className="text-center py-8">
+              <Star size={24} className="dark:text-slate-600 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500">No bookmarked queries yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {bookmarkedQueries.map(q => (
+                <div key={q._id}
+                  className="flex items-center justify-between gap-4 p-4 rounded-xl dark:bg-dark-700 bg-slate-50 border dark:border-dark-500/50 border-slate-200/60 hover:border-blue-500/30 dark:hover:border-blue-500/30 transition-colors group">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium dark:text-slate-200 text-slate-700 line-clamp-1 mb-1">
+                      {q.refinedTitle || q.title}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                      <span>{q.author?.name}</span>
+                      <span className="flex items-center gap-1"><Clock size={10} />{new Date(q.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/discussions/${q._id}`)}
+                    className="flex-shrink-0 p-2 rounded-lg dark:text-slate-400 text-slate-500 hover:text-blue-400 dark:hover:text-blue-400 dark:hover:bg-dark-600 hover:bg-blue-50 transition-colors"
+                    title="Open query">
+                    <ExternalLink size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -235,10 +235,10 @@ async function processRAGQuery(question, options = {}) {
       return `[FAQ ${i + 1}] ${f.sectionId ? `§${f.sectionId}` : ''} ${f.category} - ${f.question}\n${f.answer}`;
     }).join('\n\n---\n\n');
 
-    // Step 5: Track usage
-    scoredFAQs.forEach(async s => {
-      await FAQ.findByIdAndUpdate(s.faq._id, { $inc: { usageCount: 1 } });
-    });
+    // Step 5: Track usage — await all updates, don't fire-and-forget
+    await Promise.all(scoredFAQs.map(s =>
+      FAQ.findByIdAndUpdate(s.faq._id, { $inc: { usageCount: 1 } }).catch(() => {})
+    ));
 
     // Step 6: Generate AI answer
     let aiContent = '';

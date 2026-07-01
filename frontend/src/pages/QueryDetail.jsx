@@ -234,9 +234,16 @@ export default function QueryDetail() {
   const handleBookmark = async () => {
     if (!token) { toast.error('Please log in'); return }
     try {
+      const { user: currentUser, updateBookmarkedQueries } = useAuthStore.getState()
       const res = await api.post(`/queries/${id}/bookmark`)
-      setBookmarked(res.data.bookmarked)
-      toast.success(res.data.bookmarked ? 'Bookmarked!' : 'Removed from bookmarks')
+      const nowBookmarked = res.data.bookmarked
+      setBookmarked(nowBookmarked)
+      updateBookmarkedQueries(
+        nowBookmarked
+          ? [...(currentUser.bookmarkedQueries || []), id]
+          : (currentUser.bookmarkedQueries || []).filter(qId => qId !== id)
+      )
+      toast.success(nowBookmarked ? 'Bookmarked!' : 'Removed from bookmarks')
     } catch (e) { toast.error('Failed') }
   }
 

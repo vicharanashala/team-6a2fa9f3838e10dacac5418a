@@ -50,6 +50,7 @@ router.get('/trending', async (req, res) => {
 // GET /api/queries/:id
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
+    console.log('GET /:id req.params.id:', req.params.id, 'type:', typeof req.params.id)
     const query = await Query.findById(req.params.id)
       .populate('author', 'name role avatar phase college')
       .populate('relatedFAQs')
@@ -223,9 +224,23 @@ router.post('/:id/vote', protect, async (req, res) => {
   }
 });
 
+// GET /api/queries/bookmarked - Get current user's bookmarked queries
+router.get('/bookmarked', protect, async (req, res) => {
+  try {
+    const queries = await Query.find({ _id: { $in: req.user.bookmarkedQueries } })
+      .populate('author', 'name college phase')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json({ queries });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch bookmarked queries.' });
+  }
+});
+
 // POST /api/queries/:id/bookmark
 router.post('/:id/bookmark', protect, async (req, res) => {
   try {
+    console.log('POST /:id/bookmark req.params.id:', req.params.id, 'type:', typeof req.params.id)
     const User = require('../models/User');
     const user = await User.findById(req.user._id);
     const qId = req.params.id;
@@ -245,6 +260,7 @@ router.post('/:id/bookmark', protect, async (req, res) => {
   }
 });
 
+
 // PATCH /api/queries/:id/escalate
 router.patch('/:id/escalate', protect, async (req, res) => {
   try {
@@ -260,32 +276,37 @@ router.patch('/:id/escalate', protect, async (req, res) => {
 });
 
 // POST: /api/queries/feedback
-// Automatically routes bad AI answers to the Answer Queue
-router.post('/feedback', async (req, res) => {
+// isHelpful: false + escalationReason  → create Query + escalate it with reason/comments
+router.post('/feedback', protect, async (req, res) => {
   try {
-    const { studentId, question, aiAnswer, isHelpful } = req.body;
+    const { question, aiAnswer, isHelpful, escalationReason, escalationComments } = req.body;
 
-    if (!isHelpful) {
-      // The AI hallucinated. Route to the human Answer Queue.
-      const newQuery = new Query({
-        author: studentId || null, // Matches your existing schema setup
-        question: question,
-        aiDraftAnswer: aiAnswer,
-        status: 'open', // 'open' usually signifies it needs human attention
-        source: 'AI_Hallucination_Flag',
-        skipCount: 0,
-        isStalled: false
-      });
-
-      await newQuery.save();
-      return res.status(201).json({ message: "Bad AI answer routed to human mentors." });
+    if (isHelpful) {
+      return res.status(200).json({ message: 'Positive feedback recorded.' });
     }
 
-    return res.status(200).json({ message: "Positive feedback recorded." });
+    if (!question) {
+      return res.status(400).json({ error: 'Question is required to escalate.' });
+    }
 
+    // Create a Query from the failed AI answer
+    const newQuery = new Query({
+      title: question,
+      content: aiAnswer || question,
+      category: 'General',
+      author: req.user._id,
+      status: 'escalated',
+      isEscalated: true,
+      escalatedAt: new Date(),
+      escalatedReason: escalationReason || null,
+      escalationComments: escalationComments || null
+    });
+
+    await newQuery.save();
+    return res.status(201).json({ message: 'Escalated! A mentor will review it.', query: newQuery });
   } catch (error) {
-    console.error("Feedback error:", error);
-    return res.status(500).json({ error: "Failed to process feedback." });
+    console.error('Feedback error:', error);
+    return res.status(500).json({ error: 'Failed to process feedback.' });
   }
 });
 

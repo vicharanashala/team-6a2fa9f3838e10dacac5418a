@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { MessagesSquare, Search, Filter, Plus, Eye, MessageSquare, TrendingUp,
-         Clock, CheckCircle, AlertTriangle, Bookmark, ChevronDown } from 'lucide-react'
+         Clock, CheckCircle, AlertTriangle, Bookmark, ChevronDown, Star } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '../utils/api'
 import { useAuthStore } from '../store'
 
@@ -25,7 +26,27 @@ function StatusBadge({ status }) {
   return <span className={`text-xs border px-2.5 py-0.5 rounded-full font-medium ${c.class}`}>{c.label}</span>
 }
 
-function QueryCard({ query, onClick }) {
+function QueryCard({ query, onClick, user }) {
+  console.log('QueryCard query._id:', query._id, 'type:', typeof query._id, 'constructor:', query._id?.constructor?.name)
+  const isBookmarked = user?.bookmarkedQueries?.includes(query._id)
+
+  const handleBookmark = useCallback(async (e) => {
+    e.stopPropagation()
+    const { user: currentUser, updateBookmarkedQueries: updateBQ } = useAuthStore.getState()
+    try {
+      const res = await api.post(`/queries/${query._id}/bookmark`)
+      const nowBookmarked = res.data.bookmarked
+      const currentBookmarks = currentUser?.bookmarkedQueries || []
+      updateBQ(
+        nowBookmarked
+          ? [...currentBookmarks, query._id]
+          : currentBookmarks.filter(id => id !== query._id)
+      )
+      toast.success(nowBookmarked ? 'Bookmarked!' : 'Removed from bookmarks')
+    } catch {
+      toast.error('Failed to update bookmark')
+    }
+  }, [query._id])
   const timeAgo = (date) => {
     const d = new Date(date)
     const diff = Date.now() - d.getTime()
@@ -85,6 +106,15 @@ function QueryCard({ query, onClick }) {
         <span className="flex items-center gap-1"><MessageSquare size={11} /> {query.answers?.length || 0}</span>
         <span className="flex items-center gap-1"><Bookmark size={11} /> {query.bookmarks || 0}</span>
         <span className="flex items-center gap-1 ml-auto"><Clock size={11} /> {timeAgo(query.createdAt)}</span>
+        {user && (
+          <button
+            onClick={handleBookmark}
+            className={`ml-1 p-1 rounded transition-colors ${isBookmarked ? 'text-amber-400' : 'text-slate-500 hover:text-amber-400'}`}
+            title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+          >
+            <Star size={13} fill={isBookmarked ? 'currentColor' : 'none'} />
+          </button>
+        )}
       </div>
     </div>
   )
@@ -110,7 +140,7 @@ function SkeletonCard() {
 
 export default function Discussions() {
   const navigate = useNavigate()
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const [queries, setQueries] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -131,6 +161,10 @@ export default function Discussions() {
       const params = { category, status, sort, page, limit: 15 }
       if (search) params.search = search
       const res = await api.get('/queries', { params })
+      console.log('API /queries response[0]:', res.data.queries[0])
+      console.log('_id value:', res.data.queries[0]?._id)
+      console.log('_id type:', typeof res.data.queries[0]?._id)
+      console.log('_id constructor:', res.data.queries[0]?._id?.constructor?.name)
       setQueries(res.data.queries)
       setTotal(res.data.total)
       setPages(res.data.pages)
@@ -243,7 +277,7 @@ export default function Discussions() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(i * 0.04, 0.3) }}
               >
-                <QueryCard query={q} onClick={() => navigate(`/discussions/${q._id}`)} />
+                <QueryCard query={q} user={user} onClick={() => navigate(`/discussions/${q._id}`)} />
               </motion.div>
             ))
         }

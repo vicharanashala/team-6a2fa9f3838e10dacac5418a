@@ -22,6 +22,7 @@ import AdminAnnouncements from './pages/admin/AdminAnnouncements'
 import AdminFAQs from './pages/admin/AdminFAQs'
 import AdminEscalations from './pages/admin/AdminEscalations'
 import UploadPhotos from './pages/UploadPhotos'
+import AnswerQueue from './pages/AnswerQueue'
 
 function ProtectedRoute({ children }) {
   const token = useAuthStore(state => state.token)
@@ -88,6 +89,7 @@ export default function App() {
         <Route path="home" element={<Home />} />
         <Route path="ask" element={<AskAI />} />
         <Route path="upload-photos" element={<UploadPhotos />} />
+        <Route path="answer-queue" element={<AnswerQueue />} />
         <Route path="raise-query" element={<RaiseQuery />} />
         <Route path="discussions" element={<Discussions />} />
         <Route path="discussions/:id" element={<QueryDetail />} />

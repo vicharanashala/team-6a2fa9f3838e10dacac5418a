@@ -55,6 +55,12 @@ const querySchema = new mongoose.Schema({
   bookmarks: { type: Number, default: 0 },
   isEscalated: { type: Boolean, default: false },
   escalatedAt: Date,
+  escalatedReason: {
+    type: String,
+    enum: ['ai_incorrect', 'not_answered', 'need_human', 'technical', 'other'],
+    default: null
+  },
+  escalationComments: { type: String, default: null },
   resolvedAt: Date,
   assignedMentor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   // Refined question from AI

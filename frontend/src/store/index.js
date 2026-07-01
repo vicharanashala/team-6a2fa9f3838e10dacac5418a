@@ -48,6 +48,9 @@ export const useAuthStore = create(
 
       updateUser: (user) => set({ user }),
 
+      updateBookmarkedQueries: (bookmarkedQueries) =>
+        set(state => ({ user: { ...state.user, bookmarkedQueries } })),
+
       initAuth: () => {
         const { token } = get();
         if (token) {
@@ -62,7 +65,17 @@ export const useAuthStore = create(
         } catch (err) { console.error('Pref update failed:', err); }
       }
     }),
-    { name: 'vins-auth', partialize: (state) => ({ user: state.user, token: state.token }) }
+    { name: 'vins-auth', partialize: (state) => ({ user: state.user, token: state.token }), storage: {
+      getItem: (name) => {
+        try { const val = sessionStorage.getItem(name); return val ? JSON.parse(val) : null; } catch { return null; }
+      },
+      setItem: (name, value) => {
+        try { sessionStorage.setItem(name, JSON.stringify(value)); } catch {}
+      },
+      removeItem: (name) => {
+        try { sessionStorage.removeItem(name); } catch {}
+      }
+    } }
   )
 );
 
@@ -77,6 +90,7 @@ export const useThemeStore = create(
           actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         set({ theme: t });
+        document.body.classList.toggle('dark', actualTheme === 'dark');
         document.body.classList.toggle('light', actualTheme === 'light');
       },
       toggleTheme: () => {
@@ -84,10 +98,15 @@ export const useThemeStore = create(
         set({ theme: next });
         // Toggle .dark class for Tailwind dark: variant support
         document.body.classList.toggle('dark', next === 'dark');
+        document.body.classList.toggle('light', next === 'light');
       },
       initTheme: () => {
         const { theme } = get();
-        document.body.classList.toggle('dark', theme === 'dark');
+        const actual = theme === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          : theme;
+        document.body.classList.toggle('dark', actual === 'dark');
+        document.body.classList.toggle('light', actual === 'light');
       }
     }),
     { name: 'vins-theme' }

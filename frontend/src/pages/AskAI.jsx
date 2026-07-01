@@ -11,6 +11,7 @@ import api from '../utils/api'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { EscalationModal } from '../components/EscalationModal'
 
 const EXPLAIN_MODES = [
   { value: 'beginner', label: '🟢 Beginner', desc: 'Simple, step-by-step' },
@@ -129,6 +130,8 @@ export default function AskAI() {
   const [isListening, setIsListening] = useState(false)
   const [isPlayingTTS, setIsPlayingTTS] = useState(false)
   const [image, setImage] = useState(null)
+  const [escalationModalOpen, setEscalationModalOpen] = useState(false)
+  const [aiVoted, setAiVoted] = useState(null) // 'helpful' | 'not_helpful' | null
   const textRef = useRef(null)
   const resultRef = useRef(null)
   const recognitionRef = useRef(null)
@@ -216,6 +219,7 @@ export default function AskAI() {
       console.log('✅ AI Response:', res.data)
       setResult({ ...res.data, question: query })
       setHistory(h => [{ question: query, result: res.data }, ...h.slice(0, 9)])
+      setAiVoted(null)
       clearImage()
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'AI service unavailable. Please try again.'
@@ -315,22 +319,20 @@ export default function AskAI() {
   }
 
   //  NEW FUNCTION: Connects to the backend route we just built
-  const handleAIFeedback = async (questionText, aiAnswerText, isHelpful) => {
+  const handleAIFeedback = async ({ isHelpful, escalationReason, escalationComments } = {}) => {
     try {
       await api.post('/queries/feedback', {
-        question: questionText,
-        aiAnswer: aiAnswerText,
-        isHelpful: isHelpful,
+        question: result.question,
+        aiAnswer: result.answer,
+        isHelpful,
+        escalationReason: escalationReason || undefined,
+        escalationComments: escalationComments || undefined,
       });
-
       if (!isHelpful) {
-        toast.error("Flagged! Sent to the mentor Answer Queue.");
-      } else {
-        toast.success("Thanks! Glad the AI was helpful.");
+        toast.success('Escalated! A mentor will review it.');
       }
     } catch (error) {
-      console.error("Error submitting feedback:", error);
-      toast.error("Failed to submit feedback");
+      toast.error('Failed to submit feedback');
     }
   };
 
@@ -493,14 +495,21 @@ export default function AskAI() {
                       className={`p-1.5 rounded-lg transition-colors feedback-btn ${feedback[s.id] === 'up' ? 'bg-emerald-500/20 text-emerald-400' : ''}`}>
                       <ThumbsUp size={13} />
                     </button>
-                    <button onClick={() => handleFeedback(s.id, false)}
+                    <button
+                      onClick={() => { handleFeedback(s.id, false); setEscalationModalOpen(true) }}
                       className={`p-1.5 rounded-lg transition-colors feedback-btn ${feedback[s.id] === 'down' ? 'bg-rose-500/20 text-rose-400' : ''}`}>
                       <ThumbsDown size={13} />
                     </button>
                   </div>
                 ))}
+                <button
+                  onClick={() => setEscalationModalOpen(true)}
+                  className="ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-amber-500/30 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition-all"
+                >
+                  <AlertTriangle size={12} /> Escalate to Mentor
+                </button>
                 <button onClick={() => { setQuestion(result.question); setResult(null) }}
-                  className="ml-auto text-xs text-slate-500 hover:text-slate-300 dark:hover:text-slate-700 flex items-center gap-1 reask-btn px-2 py-1 rounded-lg transition-colors">
+                  className="text-xs text-slate-500 hover:text-slate-300 dark:hover:text-slate-700 flex items-center gap-1 reask-btn px-2 py-1 rounded-lg transition-colors">
                   <RotateCcw size={11} /> Re-ask
                 </button>
               </div>
@@ -555,6 +564,19 @@ export default function AskAI() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Escalation Modal */}
+      {escalationModalOpen && result && (
+        <EscalationModal
+          question={result.question}
+          aiAnswer={result.answer}
+          onClose={() => setEscalationModalOpen(false)}
+          onSubmit={async (reason, comments) => {
+            setEscalationModalOpen(false)
+            await handleAIFeedback({ isHelpful: false, escalationReason: reason, escalationComments: comments })
+          }}
+        />
       )}
     </div>
   )
